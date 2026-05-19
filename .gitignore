@@ -1,0 +1,23 @@
+# Build folders
+bin/
+obj/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# Playwright
+playwright-report/
+test-results/
+playwright/.cache/
+playwright/package/
+
+# Node modules
+node_modules/
+
+# Logs
+*.log
+
+# Temp
+*.tmp
