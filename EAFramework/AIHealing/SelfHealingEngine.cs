@@ -17,58 +17,49 @@ namespace EAFramework.AIHealing
             _healingStrategies = new HealingStrategies(page);
             _locatorAnalyzer = new LocatorAnalyzer(page);
 
-            _healingFilePath = ResolveHealingFilePath();
+            _healingFilePath = HealingPaths.ResolveFailedLocatorStorePath();
 
             EnsureHealingFileExists();
         }
 
-        private static string ResolveHealingFilePath()
+        public IReadOnlyDictionary<string, string> GetHealedMappings() =>
+            LoadHealedLocators();
+
+        public void RemoveHealedMapping(string originalSelector)
         {
-            // Prefer writing to the repo file (so users can see updates under EAFramework/AIHealing),
-            // but fall back to the runtime output folder if we can't locate the repo.
-            try
+            Dictionary<string, string> locators = LoadHealedLocators();
+
+            if (locators.Remove(originalSelector))
             {
-                var current = new DirectoryInfo(AppContext.BaseDirectory);
-
-                for (int i = 0; i < 10 && current != null; i++)
-                {
-                    string candidate = Path.Combine(
-                        current.FullName,
-                        "EAFramework",
-                        "AIHealing",
-                        "FailedLocatorStore.json");
-
-                    if (File.Exists(candidate))
-                    {
-                        return candidate;
-                    }
-
-                    // If we find EAFramework.csproj, we know we're at the framework root.
-                    string csprojCandidate =
-                        Path.Combine(current.FullName, "EAFramework.csproj");
-
-                    if (File.Exists(csprojCandidate))
-                    {
-                        string localCandidate = Path.Combine(
-                            current.FullName,
-                            "AIHealing",
-                            "FailedLocatorStore.json");
-
-                        return localCandidate;
-                    }
-
-                    current = current.Parent;
-                }
+                PersistHealedLocators(locators);
             }
-            catch
+        }
+
+        public void ClearHealedMappings()
+        {
+            PersistHealedLocators(new Dictionary<string, string>());
+        }
+
+        public void ExportHealingReport(string reportPath)
+        {
+            Dictionary<string, string> healingData = LoadHealedLocators();
+
+            List<string> reportLines = new()
             {
-                // ignore and fall back
+                "========== AI SELF-HEALING REPORT ==========",
+                $"Generated On : {DateTime.Now:O}",
+                $"Store File    : {_healingFilePath}",
+                "",
+            };
+
+            foreach (KeyValuePair<string, string> item in healingData)
+            {
+                reportLines.Add($"Original Locator : {item.Key}");
+                reportLines.Add($"Healed Selector  : {item.Value}");
+                reportLines.Add("------------------------------------");
             }
 
-            return Path.Combine(
-                AppContext.BaseDirectory,
-                "AIHealing",
-                "FailedLocatorStore.json");
+            File.WriteAllLines(reportPath, reportLines);
         }
 
         public async Task<ILocator> FindElementAsync(string selector)
@@ -116,13 +107,28 @@ namespace EAFramework.AIHealing
         {
             var healedLocators = LoadHealedLocators();
 
-            if (healedLocators.TryGetValue(failedSelector, out string? cachedSelector)
-                && await IsSelectorUsableAsync(cachedSelector))
+            if (healedLocators.TryGetValue(failedSelector, out string? cachedSelector))
             {
-                return _page.Locator(cachedSelector);
+                if (IsSuspiciousHealedPair(failedSelector, cachedSelector))
+                {
+                    RemoveHealedMapping(failedSelector);
+                }
+                else if (await IsSelectorUsableAsync(cachedSelector))
+                {
+                    return _page.Locator(cachedSelector);
+                }
             }
 
             string? healedSelector =
+                await TryHealPlaceholderInputAsync(failedSelector);
+
+            healedSelector ??=
+                await TryBuiltInAlternativesAsync(failedSelector);
+
+            healedSelector ??=
+                await TryPlaywrightSemanticLocatorAsync(failedSelector);
+
+            healedSelector ??=
                 await _healingStrategies.TryHealToSelectorAsync(failedSelector);
 
             try
@@ -135,14 +141,11 @@ namespace EAFramework.AIHealing
                 // Analyzer regex safety net; continue with built-in fallbacks.
             }
 
-            healedSelector ??=
-                await TryBuiltInAlternativesAsync(failedSelector);
-
-            healedSelector ??=
-                await TryPlaywrightSemanticLocatorAsync(failedSelector);
+            healedSelector =
+                DiscardSuspiciousHeal(failedSelector, healedSelector);
 
             if (healedSelector != null
-                && await IsSelectorUsableAsync(healedSelector))
+                && await CanUseHealedSelectorAsync(failedSelector, healedSelector))
             {
                 SaveHealedLocator(failedSelector, healedSelector);
                 return _page.Locator(healedSelector);
@@ -152,12 +155,151 @@ namespace EAFramework.AIHealing
                 $"Unable to locate element after self-healing: {failedSelector}");
         }
 
+        /// <summary>
+        /// Strict visibility when possible; fall back to DOM presence for healed controls so healing
+        /// does not lose valid <c>input[placeholder='…']</c> targets during animations or layout.
+        /// </summary>
+        private async Task<bool> CanUseHealedSelectorAsync(
+            string failedSelector,
+            string healedSelector)
+        {
+            if (DiscardSuspiciousHeal(failedSelector, healedSelector) == null)
+            {
+                return false;
+            }
+
+            if (await IsSelectorUsableAsync(healedSelector))
+            {
+                return true;
+            }
+
+            ILocator loc = _page.Locator(healedSelector);
+
+            return await loc.CountAsync() > 0;
+        }
+
+        private static string? DiscardSuspiciousHeal(
+            string failedSelector,
+            string? healedSelector)
+        {
+            if (healedSelector == null
+                || IsSuspiciousHealedPair(failedSelector, healedSelector))
+            {
+                return null;
+            }
+
+            return healedSelector;
+        }
+
+        /// <summary>
+        /// Detects bad historical heals (e.g. mapping a search <c>input</c> failure to a visible <c>.search-card</c> container).
+        /// </summary>
+        private static bool IsSuspiciousHealedPair(
+            string failedSelector,
+            string healedSelector)
+        {
+            bool inputish =
+                failedSelector.Contains("input[", StringComparison.OrdinalIgnoreCase)
+                || failedSelector.Contains("placeholder=", StringComparison.OrdinalIgnoreCase);
+
+            if (!inputish)
+            {
+                return false;
+            }
+
+            string h = healedSelector.Trim();
+
+            if (h.Length == 0
+                || h.Contains("input[", StringComparison.OrdinalIgnoreCase)
+                || h.Contains("placeholder=", StringComparison.OrdinalIgnoreCase)
+                || h.Contains("@name=", StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+
+            // lone class selector — usually a layout wrapper, not the control.
+            return h.StartsWith(".", StringComparison.Ordinal)
+                   && h.IndexOf(' ') < 0
+                   && h.IndexOf(">", StringComparison.Ordinal) < 0;
+        }
+
+        /// <summary>
+        /// Prefer a concrete input placeholder match (avoids healing to a broad visible container).
+        /// </summary>
+        private async Task<string?> TryHealPlaceholderInputAsync(string failedSelector)
+        {
+            var placeholderMatch = Regex.Match(
+                failedSelector,
+                @"placeholder=['""]([^'""]+)['""]",
+                RegexOptions.IgnoreCase);
+
+            if (!placeholderMatch.Success)
+            {
+                return null;
+            }
+
+            string placeholder = placeholderMatch.Groups[1].Value;
+            List<string> candidates = new()
+            {
+                $"input[placeholder='{placeholder}']",
+            };
+
+                if (failedSelector.Contains(
+                        "form.search-card",
+                        StringComparison.OrdinalIgnoreCase))
+                {
+                    candidates.Add("form.search-card input[name='searchTerm']");
+                }
+
+            foreach (string candidate in candidates)
+            {
+                ILocator loc = _page.Locator(candidate);
+
+                if (await loc.CountAsync() == 0)
+                {
+                    continue;
+                }
+
+                try
+                {
+                    await loc.First.WaitForAsync(new()
+                    {
+                        State = WaitForSelectorState.Visible,
+                        Timeout = 15000
+                    });
+
+                    return candidate;
+                }
+                catch
+                {
+                    if (await loc.First.CountAsync() > 0)
+                    {
+                        return candidate;
+                    }
+                }
+            }
+
+            return null;
+        }
+
         private async Task<string?> TryBuiltInAlternativesAsync(
             string failedSelector)
         {
-            foreach (var candidate in BuildAlternativeSelectors(failedSelector))
+            foreach (string candidate in BuildAlternativeSelectors(failedSelector))
             {
+                if (DiscardSuspiciousHeal(failedSelector, candidate) == null)
+                {
+                    continue;
+                }
+
                 if (await IsSelectorUsableAsync(candidate))
+                {
+                    return candidate;
+                }
+
+                ILocator loc = _page.Locator(candidate);
+
+                if (await loc.CountAsync() > 0)
                 {
                     return candidate;
                 }
@@ -171,18 +313,22 @@ namespace EAFramework.AIHealing
         {
             var alternatives = new List<string>();
 
-            if (failedSelector.StartsWith("#", StringComparison.Ordinal))
-            {
-                string idValue = failedSelector[1..];
-                alternatives.Add($"[id*='{idValue}']");
-                alternatives.Add($"[name*='{idValue}']");
-                alternatives.Add($"input#{idValue}");
-            }
+            var placeholderMatch = Regex.Match(
+                failedSelector,
+                @"placeholder=['""]([^'""]+)['""]",
+                RegexOptions.IgnoreCase);
 
-            if (failedSelector.StartsWith(".", StringComparison.Ordinal))
+            if (placeholderMatch.Success)
             {
-                string classValue = failedSelector[1..];
-                alternatives.Add($"[class*='{classValue}']");
+                alternatives.Add(
+                    $"input[placeholder='{placeholderMatch.Groups[1].Value}']");
+
+                if (failedSelector.Contains(
+                        "form.search-card",
+                        StringComparison.OrdinalIgnoreCase))
+                {
+                    alternatives.Add("form.search-card input[name='searchTerm']");
+                }
             }
 
             var nameMatch = Regex.Match(
@@ -210,15 +356,18 @@ namespace EAFramework.AIHealing
                 alternatives.Add($"button:has-text('{text}')");
             }
 
-            var placeholderMatch = Regex.Match(
-                failedSelector,
-                @"placeholder=['""]([^'""]+)['""]",
-                RegexOptions.IgnoreCase);
-
-            if (placeholderMatch.Success)
+            if (failedSelector.StartsWith("#", StringComparison.Ordinal))
             {
-                alternatives.Add(
-                    $"input[placeholder='{placeholderMatch.Groups[1].Value}']");
+                string idValue = failedSelector[1..];
+                alternatives.Add($"[id*='{idValue}']");
+                alternatives.Add($"[name*='{idValue}']");
+                alternatives.Add($"input#{idValue}");
+            }
+
+            if (failedSelector.StartsWith(".", StringComparison.Ordinal))
+            {
+                string classValue = failedSelector[1..];
+                alternatives.Add($"[class*='{classValue}']");
             }
 
             return alternatives.Distinct();
@@ -283,11 +432,38 @@ namespace EAFramework.AIHealing
             Dictionary<string, string> locators = LoadHealedLocators();
             locators[originalSelector] = healedSelector;
 
+            PersistHealedLocators(locators);
+            AppendAutoHealReport(originalSelector, healedSelector);
+        }
+
+        private void PersistHealedLocators(Dictionary<string, string> locators)
+        {
             string json = JsonSerializer.Serialize(
                 locators,
                 new JsonSerializerOptions { WriteIndented = true });
 
             File.WriteAllText(_healingFilePath, json);
+        }
+
+        private static void AppendAutoHealReport(
+            string originalSelector,
+            string healedSelector)
+        {
+            string reportPath = HealingPaths.ResolveAutoHealReportPath();
+            string? folder = Path.GetDirectoryName(reportPath);
+
+            if (!string.IsNullOrEmpty(folder) && !Directory.Exists(folder))
+            {
+                Directory.CreateDirectory(folder);
+            }
+
+            string block =
+                $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}]" + Environment.NewLine
+                + $"  Original: {originalSelector}" + Environment.NewLine
+                + $"  Healed  : {healedSelector}" + Environment.NewLine
+                + Environment.NewLine;
+
+            File.AppendAllText(reportPath, block);
         }
 
         private void EnsureHealingFileExists()

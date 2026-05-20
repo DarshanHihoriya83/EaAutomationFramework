@@ -1,0 +1,10 @@
+
+
+[2026-05-20 16:16:53]
+  Original: form.search-card input[name='searchTerm']xxx
+  Healed  : [name='searchTerm']
+
+[2026-05-20 16:16:59]
+  Original: .form-card-body .form-row-2 #Email12
+  Healed  : .form-card-body
+

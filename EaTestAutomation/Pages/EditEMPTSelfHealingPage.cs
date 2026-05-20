@@ -1,42 +1,47 @@
-using EAFramework.Extension;
 using EAFramework.Base;
+using EAFramework.Extension;
 using Microsoft.Playwright;
 
 namespace EaTestAutomation.Pages
 {
     /// <summary>
-    /// Edit Employee page — same locators as <see cref="EditEMPPage"/>,
-    /// with AI self-healing fallback when primary locators fail.
+    /// Edit Employee page using a single selector per control. All actions go through
+    /// <see cref="PageBase"/> so <see cref="EAFramework.AIHealing.SelfHealingEngine"/> can heal failed locators
+    /// and persist mappings to <c>FailedLocatorStore.json</c>.
     /// </summary>
     public class EditEMPTSelfHealingPage : PageBase
     {
-        // Primary locator strings (used by SelfHealingEngine when ILocator path fails)
         private const string EmployeesLinkSelector =
             "nav .container a:has-text('Employees')";
 
+        private const string SearchFormSelector = "form.search-card";
+
         private const string SearchInputSelector =
-            "form.search-card input[placeholder='Search by name...']";
+            "form.search-card input[name='searchTerm']";
 
         private const string SearchButtonSelector =
             "form.search-card button.btn-search";
 
         private const string FullNameSelector =
-            ".form-card-body >> xpath=//input[@name='Name']";
+            ".form-card-body input[name='Name']";
 
+        /// <summary>
+        /// Must match the live DOM / <see cref="EditEMPPage"/> (<c>Name="Age"</c>, not <c>age1</c>).
+        /// </summary>
         private const string AgeSelector =
-            ".form-card-body .form-row-2 >> xpath=//input[@name='age1']";
+            ".form-card-body .form-row-2 input[name='Age']";
 
         private const string SalarySelector =
-            ".form-card-body .form-row-2 >> #Salary";
+            ".form-card-body .form-row-2 #Salary";
 
         private const string DurationSelector =
-            ".form-card-body .form-row-2 >> xpath=//input[@name='DurationWorked']";
+            ".form-card-body .form-row-2 input[name='DurationWorked']";
 
         private const string EmailSelector =
-            ".form-card-body .form-row-2 >> #Email";
+            ".form-card-body .form-row-2 #Email12";
 
         private const string SaveChangesSelector =
-            ".form-card-body .form-actions >> button:has-text('Save Changes')";
+            ".form-card-body .form-actions button:has-text('Save Changes')";
 
         private const string GradeSelector = "#Grade";
 
@@ -44,61 +49,50 @@ namespace EaTestAutomation.Pages
         {
         }
 
-        // ----- Original EditEMPPage locator chains (reference locators) -----
+        /// <summary>XPath literal for <c>normalize-space()=...</c> comparisons.</summary>
+        private static string XPathStringLiteral(string value)
+        {
+            if (value.IndexOf('\'', StringComparison.Ordinal) < 0)
+            {
+                return "'" + value + "'";
+            }
 
-        private ILocator NavigationBar => _page.Locator("nav");
+            string[] parts = value.Split('\'');
+            var sb = new System.Text.StringBuilder("concat(");
 
-        private ILocator EmployeesDiv => NavigationBar.Locator(".container");
+            for (int i = 0; i < parts.Length; i++)
+            {
+                if (i > 0)
+                {
+                    sb.Append(", \"'\", ");
+                }
 
-        private ILocator EmployeesLink =>
-            EmployeesDiv.Locator("a:has-text('Employees')");
+                sb.Append('\'');
+                sb.Append(parts[i]);
+                sb.Append('\'');
+            }
 
-        private ILocator SearchFormDiv => _page.Locator("form.search-card");
+            sb.Append(')');
+            return sb.ToString();
+        }
 
-        private ILocator SearchInput =>
-            SearchFormDiv.GetByPlaceholder("Search by name...");
+        private static string EditEmployeeButtonSelector(string employeeName)
+        {
+            string lit = XPathStringLiteral(employeeName);
 
-        private ILocator SearchButton =>
-            SearchFormDiv.Locator("button.btn-search");
-
-        private ILocator EmployeeTable =>
-            _page.Locator(".employee-table-card table");
-
-        private ILocator EditForm => _page.Locator(".form-card-body");
-
-        private ILocator Formrow2Input => EditForm.Locator(".form-row-2");
-
-        private ILocator FullNameInput =>
-            EditForm.Locator("//input[@name='Name']");
-
-        private ILocator EditAge =>
-            Formrow2Input.Locator("//input[@name='age1']");
-
-        private ILocator EditSalary => Formrow2Input.Locator("#Salary");
-
-        private ILocator DurationWorked =>
-            Formrow2Input.Locator("//input[@name='DurationWorked']");
-
-        private ILocator EditEmail => Formrow2Input.Locator("#Email");
-
-        private ILocator SaveChangesButtonDiv =>
-            EditForm.Locator(".form-actions");
-
-        private ILocator SaveChangesButton =>
-            SaveChangesButtonDiv.Locator("button:has-text('Save Changes')");
+            return "xpath=//*[contains(@class,'employee-table-card')]"
+                   + "//tbody//tr[.//*[contains(@class,'emp-name')"
+                   + " and normalize-space()=" + lit + "]]"
+                   + "//a[contains(@class,'btn-edit')]";
+        }
 
         public async Task ClickEmployees()
         {
-            try
-            {
-                await EmployeesLink.ClickExAsync();
-            }
-            catch
-            {
-                await ClickAsync(EmployeesLinkSelector);
-            }
+            await ClickAsync(EmployeesLinkSelector);
 
-            await SearchFormDiv.WaitForAsync(new()
+            ILocator searchForm = await FindAsync(SearchFormSelector);
+
+            await searchForm.WaitForAsync(new()
             {
                 State = WaitForSelectorState.Visible,
                 Timeout = 15000
@@ -107,146 +101,53 @@ namespace EaTestAutomation.Pages
 
         public async Task FillSearchInput(string name)
         {
-            try
-            {
-                await SearchInput.WaitForAsync(new()
-                {
-                    State = WaitForSelectorState.Visible,
-                    Timeout = 10000
-                });
-
-                await SearchInput.ClearAsync();
-                await SearchInput.FillAsync(name);
-            }
-            catch
-            {
-                await FillAsync(SearchInputSelector, name);
-            }
+            await JsFillAsync(SearchInputSelector, name);
         }
 
         public async Task ClickSearchButton()
         {
-            try
-            {
-                await SearchButton.ClickAsync();
-            }
-            catch
-            {
-                await ClickAsync(SearchButtonSelector);
-            }
-
-            await _page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+            await ClickAsync(SearchButtonSelector);
+            await _page.WaitForNetworkIdleAsync();
         }
 
         public async Task FilterUserandEditUser(string name)
         {
-            var employeeRow = EmployeeTable
-                .Locator("tbody tr")
-                .Filter(new()
-                {
-                    Has = _page.Locator(".emp-name")
-                        .GetByText(name, new() { Exact = true })
-                });
-
-            if (await employeeRow.CountAsync() == 0)
-            {
-                employeeRow = EmployeeTable
-                    .Locator("tbody tr")
-                    .Filter(new()
-                    {
-                        Has = _page.Locator(".emp-name")
-                            .GetByText(name, new() { Exact = false })
-                    });
-            }
-
-            await employeeRow.First.WaitForAsync(new()
-            {
-                State = WaitForSelectorState.Visible,
-                Timeout = 30000
-            });
-
-            var editButton = employeeRow.First.Locator(".action-group a.btn-edit");
-
-            try
-            {
-                await editButton.ClickAsync();
-            }
-            catch
-            {
-                await ClickAsync(editButton);
-            }
+            await ClickAsync(EditEmployeeButtonSelector(name));
         }
 
         public async Task EditFullname(string name)
         {
-            await FillFieldAsync(FullNameInput, FullNameSelector, name);
+            await JsFillAsync(FullNameSelector, name);
         }
 
         public async Task EditEditAge(string age)
         {
-            await FillFieldAsync(EditAge, AgeSelector, age);
+            await JsFillAsync(AgeSelector, age);
         }
 
         public async Task EditSalaryInput(string salary)
         {
-            await FillFieldAsync(EditSalary, SalarySelector, salary);
+            await JsFillAsync(SalarySelector, salary);
         }
 
         public async Task EditDurationwork(string durationWorked)
         {
-            await FillFieldAsync(DurationWorked, DurationSelector, durationWorked);
+            await JsFillAsync(DurationSelector, durationWorked);
         }
 
         public async Task EditGradeSelectDropdownOptionAsync(string grade)
         {
-            try
-            {
-                await _page.SelectOptionAsync(
-                    GradeSelector,
-                    new SelectOptionValue { Label = grade });
-            }
-            catch
-            {
-                await SelectDropdownAsync(GradeSelector, grade);
-            }
+            await SelectDropdownAsync(GradeSelector, grade);
         }
 
         public async Task EditEmailInput(string email)
         {
-            await FillFieldAsync(EditEmail, EmailSelector, email);
+            await JsFillAsync(EmailSelector, email);
         }
 
         public async Task ClickonSaveChangesButton()
         {
-            try
-            {
-                await SaveChangesButton.ClickAsync();
-            }
-            catch
-            {
-                await ClickAsync(SaveChangesSelector);
-            }
-        }
-
-        /// <summary>
-        /// Uses original EditEMPPage locator first; falls back to AI self-healing selector.
-        /// </summary>
-        private async Task FillFieldAsync(
-            ILocator primaryLocator,
-            string healingSelector,
-            string value)
-        {
-            try
-            {
-                await primaryLocator.ClickAsync();
-                await primaryLocator.ClearAsync();
-                await primaryLocator.FillAsync(value);
-            }
-            catch
-            {
-                await ClearTextAsync(healingSelector);
-                await FillAsync(healingSelector, value);
-            }
+            await ClickAsync(SaveChangesSelector);
         }
     }
 }

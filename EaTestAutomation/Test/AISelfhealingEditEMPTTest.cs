@@ -62,22 +62,21 @@ namespace EaTestAutomation.Test
             string email,
             string testName)
         {
-            bool testResult = false;
-            string errorMessage = "";
+            bool testResult;
+            string errorMessage;
 
             var editPage = new EditEMPTSelfHealingPage(Page);
 
-            try
+            Exception? failure = await Record.ExceptionAsync(async () =>
             {
-                await Page.GotoAsync(
+                await editPage.NavigateAsync(
                     $"{_testSettings.Applicationurl.TrimEnd('/')}/Employee");
 
                 await editPage.ClickEmployees();
 
-                // Intentionally use a broken selector once to force healing + storage in FailedLocatorStore.json.
-                // This validates that the self-healing engine persists mappings when healing occurs.
+                // Intentionally use a broken selector once so the engine persists a mapping in FailedLocatorStore.json.
                 await editPage.FillAsync(
-                    "form.search-card input[placeholder='Search by name...']xxx",
+                    "form.search-card input[name='searchTerm']xxx",
                     name);
 
                 await editPage.FillSearchInput(name);
@@ -90,22 +89,20 @@ namespace EaTestAutomation.Test
                 await editPage.EditGradeSelectDropdownOptionAsync(grade);
                 await editPage.EditEmailInput(email);
                 await editPage.ClickonSaveChangesButton();
+            });
 
-                testResult = true;
-            }
-            catch (Exception ex)
+            testResult = failure is null;
+            errorMessage = failure?.Message ?? string.Empty;
+
+            ExcelTestTracker.WriteTestResult(
+                WORKSHEET_NAME,
+                testName,
+                testResult,
+                errorMessage);
+
+            if (failure is not null)
             {
-                errorMessage = ex.Message;
-                testResult = false;
-                throw;
-            }
-            finally
-            {
-                ExcelTestTracker.WriteTestResult(
-                    WORKSHEET_NAME,
-                    testName,
-                    testResult,
-                    errorMessage);
+                throw failure;
             }
         }
     }

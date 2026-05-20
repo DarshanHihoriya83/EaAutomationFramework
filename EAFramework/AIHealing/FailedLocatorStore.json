@@ -1,1 +1,4 @@
-{}
+{
+  "form.search-card input[name=\u0027searchTerm\u0027]xxx": "[name=\u0027searchTerm\u0027]",
+  ".form-card-body .form-row-2 #Email12": ".form-card-body"
+}
