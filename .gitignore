@@ -21,3 +21,11 @@ node_modules/
 
 # Temp
 *.tmp
+
+# Test / Playwright artifacts (per-run outputs)
+Artifacts/
+
+# Generated dashboard outputs (README kept in repo)
+EaTestAutomation/DashboardReport/index.html
+EaTestAutomation/DashboardReport/dashboard-data.json
+EaTestAutomation/DashboardReport/test-results.json

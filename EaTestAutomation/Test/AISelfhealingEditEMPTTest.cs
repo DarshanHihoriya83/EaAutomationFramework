@@ -1,4 +1,5 @@
 using ClosedXML.Excel;
+using EAFramework.Reporting;
 using EaTestAutomation.Base;
 using EaTestAutomation.Pages;
 using EaTestAutomation.Utilities;
@@ -65,6 +66,8 @@ namespace EaTestAutomation.Test
             bool testResult;
             string errorMessage;
 
+            BindArtifactToTestCase(testName);
+
             var editPage = new EditEMPTSelfHealingPage(Page);
 
             Exception? failure = await Record.ExceptionAsync(async () =>
@@ -93,6 +96,8 @@ namespace EaTestAutomation.Test
 
             testResult = failure is null;
             errorMessage = failure?.Message ?? string.Empty;
+
+            TestArtifactScope.MarkPassed(testResult);
 
             ExcelTestTracker.WriteTestResult(
                 WORKSHEET_NAME,
