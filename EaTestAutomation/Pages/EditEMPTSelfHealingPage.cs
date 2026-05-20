@@ -24,7 +24,7 @@ namespace EaTestAutomation.Pages
             ".form-card-body >> xpath=//input[@name='Name']";
 
         private const string AgeSelector =
-            ".form-card-body .form-row-2 >> xpath=//input[@name='age']";
+            ".form-card-body .form-row-2 >> xpath=//input[@name='age1']";
 
         private const string SalarySelector =
             ".form-card-body .form-row-2 >> #Salary";
@@ -72,7 +72,7 @@ namespace EaTestAutomation.Pages
             EditForm.Locator("//input[@name='Name']");
 
         private ILocator EditAge =>
-            Formrow2Input.Locator("//input[@name='age']");
+            Formrow2Input.Locator("//input[@name='age1']");
 
         private ILocator EditSalary => Formrow2Input.Locator("#Salary");
 

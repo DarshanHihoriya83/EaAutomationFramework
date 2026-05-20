@@ -73,6 +73,13 @@ namespace EaTestAutomation.Test
                     $"{_testSettings.Applicationurl.TrimEnd('/')}/Employee");
 
                 await editPage.ClickEmployees();
+
+                // Intentionally use a broken selector once to force healing + storage in FailedLocatorStore.json.
+                // This validates that the self-healing engine persists mappings when healing occurs.
+                await editPage.FillAsync(
+                    "form.search-card input[placeholder='Search by name...']xxx",
+                    name);
+
                 await editPage.FillSearchInput(name);
                 await editPage.ClickSearchButton();
                 await editPage.FilterUserandEditUser(name);

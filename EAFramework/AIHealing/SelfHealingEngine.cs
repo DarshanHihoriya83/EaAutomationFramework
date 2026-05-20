@@ -17,12 +17,58 @@ namespace EAFramework.AIHealing
             _healingStrategies = new HealingStrategies(page);
             _locatorAnalyzer = new LocatorAnalyzer(page);
 
-            _healingFilePath = Path.Combine(
+            _healingFilePath = ResolveHealingFilePath();
+
+            EnsureHealingFileExists();
+        }
+
+        private static string ResolveHealingFilePath()
+        {
+            // Prefer writing to the repo file (so users can see updates under EAFramework/AIHealing),
+            // but fall back to the runtime output folder if we can't locate the repo.
+            try
+            {
+                var current = new DirectoryInfo(AppContext.BaseDirectory);
+
+                for (int i = 0; i < 10 && current != null; i++)
+                {
+                    string candidate = Path.Combine(
+                        current.FullName,
+                        "EAFramework",
+                        "AIHealing",
+                        "FailedLocatorStore.json");
+
+                    if (File.Exists(candidate))
+                    {
+                        return candidate;
+                    }
+
+                    // If we find EAFramework.csproj, we know we're at the framework root.
+                    string csprojCandidate =
+                        Path.Combine(current.FullName, "EAFramework.csproj");
+
+                    if (File.Exists(csprojCandidate))
+                    {
+                        string localCandidate = Path.Combine(
+                            current.FullName,
+                            "AIHealing",
+                            "FailedLocatorStore.json");
+
+                        return localCandidate;
+                    }
+
+                    current = current.Parent;
+                }
+            }
+            catch
+            {
+                // ignore and fall back
+            }
+
+            return Path.Combine(
                 AppContext.BaseDirectory,
                 "AIHealing",
                 "FailedLocatorStore.json");
-
-            EnsureHealingFileExists();
         }
 
         public async Task<ILocator> FindElementAsync(string selector)
@@ -217,10 +263,17 @@ namespace EAFramework.AIHealing
 
         private Dictionary<string, string> LoadHealedLocators()
         {
-            string json = File.ReadAllText(_healingFilePath);
+            try
+            {
+                string json = File.ReadAllText(_healingFilePath);
 
-            return JsonSerializer.Deserialize<Dictionary<string, string>>(json)
-                   ?? new Dictionary<string, string>();
+                return JsonSerializer.Deserialize<Dictionary<string, string>>(json)
+                       ?? new Dictionary<string, string>();
+            }
+            catch
+            {
+                return new Dictionary<string, string>();
+            }
         }
 
         private void SaveHealedLocator(
