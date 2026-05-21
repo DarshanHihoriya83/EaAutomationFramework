@@ -17,13 +17,16 @@ h1 { margin:0 0 6px; font-size:1.75rem; }
 .live-dot { width:8px; height:8px; border-radius:50%; background:#22c55e; animation:pulse 1.5s infinite; }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
 .kpi-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:16px; padding:24px 32px; }
+.kpi-grid-6 { grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); }
 .kpi { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:20px; }
 .kpi-value { font-size:2rem; font-weight:700; }
 .kpi-label { color:var(--muted); margin-top:4px; font-size:.9rem; }
 .kpi-green .kpi-value { color:#22c55e; } .kpi-red .kpi-value { color:#ef4444; }
 .kpi-blue .kpi-value { color:#38bdf8; } .kpi-amber .kpi-value { color:#f59e0b; }
+.kpi-purple .kpi-value { color:#a78bfa; } .kpi-slate .kpi-value { color:#94a3b8; }
 .charts-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:20px; padding:0 32px 24px; }
 .charts-grid-4 { grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); }
+.charts-grid-5 { grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); }
 .kpi { cursor:pointer; }
 .btn-delete { background:#7f1d1d; color:#fecaca; border:1px solid #991b1b; border-radius:6px; padding:6px 12px; cursor:pointer; font-size:.8rem; }
 .btn-delete:hover { background:#991b1b; }
@@ -60,13 +63,16 @@ th { background:#1e293b; color:var(--muted); font-weight:600; }
 <div class='stamp' id='updatedStamp'>Loading…</div>
 </div>
 </header>
-<section class='kpi-grid'>
+<section class='kpi-grid kpi-grid-6'>
 <div class='kpi kpi-blue'><div class='kpi-value' id='kpiTotal'>—</div><div class='kpi-label'>Total runs</div></div>
 <div class='kpi kpi-green'><div class='kpi-value' id='kpiPassed'>—</div><div class='kpi-label'>Passed</div></div>
 <div class='kpi kpi-red'><div class='kpi-value' id='kpiFailed'>—</div><div class='kpi-label'>Failed</div></div>
+<div class='kpi kpi-purple'><div class='kpi-value' id='kpiPassRate'>—</div><div class='kpi-label'>Pass rate</div></div>
+<div class='kpi kpi-slate'><div class='kpi-value' id='kpiFailRate'>—</div><div class='kpi-label'>Fail rate</div></div>
 <div class='kpi kpi-amber'><div class='kpi-value' id='kpiHealing'>—</div><div class='kpi-label'>Healed locators</div></div>
 </section>
-<section class='charts-grid charts-grid-4'>
+<section class='charts-grid charts-grid-5'>
+<div class='card chart-card'><h2>Pass / fail %</h2><canvas id='passRateChart'></canvas></div>
 <div class='card chart-card'><h2>Test status</h2><canvas id='statusChart'></canvas></div>
 <div class='card chart-card'><h2>Run duration</h2><canvas id='runtimeChart'></canvas></div>
 <div class='card chart-card'><h2>Execution timeline</h2><canvas id='timelineChart'></canvas></div>
@@ -94,47 +100,350 @@ th { background:#1e293b; color:var(--muted); font-weight:600; }
 <footer class='footer'>EA Framework · Playwright · Self-healing · Single live report</footer>
 <script type="application/json" id="embeddedDashboardData">
 {
-  "updatedUtc": "2026-05-21T07:51:11.4698822Z",
+  "updatedUtc": "2026-05-21T16:36:04.4043763Z",
   "dashboardUrl": "http://127.0.0.1:8765/",
-  "total": 1,
-  "passed": 1,
+  "total": 13,
+  "passed": 2,
   "failed": 0,
-  "unknown": 0,
-  "healingTotal": 2,
+  "unknown": 11,
+  "healingTotal": 6,
+  "passRatePercent": 15.4,
+  "failRatePercent": 0,
+  "unknownRatePercent": 84.6,
   "runs": [
     {
-      "runId": "AISelfHeal_EditEmployee_Raj_20260521_131028098_d4bfd7ce",
-      "testName": "AISelfHeal_EditEmployee_Raj",
+      "runId": "AddNewEMPInlineTDDTest_AddNewEmployeeInlineTDDTest_20260521_220238363_44773454",
+      "testName": "AddNewEMPInlineTDDTest_AddNewEmployeeInlineTDDTest_20260521",
+      "status": "Unknown",
+      "startedUtc": "2026-05-21T16:34:20.317942Z",
+      "finishedUtc": "2026-05-21T16:34:20.317942Z",
+      "durationMs": 0,
+      "durationDisplay": "0 ms",
+      "artifactFolder": "AddNewEMPInlineTDDTest_AddNewEmployeeInlineTDDTest_20260521_220238363_44773454",
+      "healingMappingCount": 0,
+      "links": {
+        "video": null,
+        "trace": null,
+        "screenshot": null,
+        "logs": "http://127.0.0.1:8765/artifacts/AddNewEMPInlineTDDTest_AddNewEmployeeInlineTDDTest_20260521_220238363_44773454/logs/execution.log",
+        "healing": null
+      }
+    },
+    {
+      "runId": "AddNewEmpAutoTestDataCreationTest_AddNewEmployeeAutoTestDataCreationTest_20260521_220238363_ae160e7d",
+      "testName": "AddNewEmpAutoTestDataCreationTest_AddNewEmployeeAutoTestDataCreationTest_20260521",
+      "status": "Unknown",
+      "startedUtc": "2026-05-21T16:34:08.269378Z",
+      "finishedUtc": "2026-05-21T16:34:08.269378Z",
+      "durationMs": 0,
+      "durationDisplay": "0 ms",
+      "artifactFolder": "AddNewEmpAutoTestDataCreationTest_AddNewEmployeeAutoTestDataCreationTest_20260521_220238363_ae160e7d",
+      "healingMappingCount": 0,
+      "links": {
+        "video": null,
+        "trace": null,
+        "screenshot": null,
+        "logs": "http://127.0.0.1:8765/artifacts/AddNewEmpAutoTestDataCreationTest_AddNewEmployeeAutoTestDataCreationTest_20260521_220238363_ae160e7d/logs/execution.log",
+        "healing": null
+      }
+    },
+    {
+      "runId": "AddNewEMPExcelReaderTest_AddNewEmployeeTest_20260521_220238363_691930c1",
+      "testName": "AddNewEMPExcelReaderTest_AddNewEmployeeTest_20260521",
+      "status": "Unknown",
+      "startedUtc": "2026-05-21T16:33:52.9355886Z",
+      "finishedUtc": "2026-05-21T16:33:52.9355886Z",
+      "durationMs": 0,
+      "durationDisplay": "0 ms",
+      "artifactFolder": "AddNewEMPExcelReaderTest_AddNewEmployeeTest_20260521_220238363_691930c1",
+      "healingMappingCount": 0,
+      "links": {
+        "video": null,
+        "trace": null,
+        "screenshot": null,
+        "logs": "http://127.0.0.1:8765/artifacts/AddNewEMPExcelReaderTest_AddNewEmployeeTest_20260521_220238363_691930c1/logs/execution.log",
+        "healing": null
+      }
+    },
+    {
+      "runId": "AddNEWEmployeeConcurentwithTDDTest_AddNEWEmpConcurentwithTDDTest_20260521_220238363_b023faf0",
+      "testName": "AddNEWEmployeeConcurentwithTDDTest_AddNEWEmpConcurentwithTDDTest_20260521",
+      "status": "Unknown",
+      "startedUtc": "2026-05-21T16:32:38.3667081Z",
+      "finishedUtc": "2026-05-21T16:32:38.3667081Z",
+      "durationMs": 0,
+      "durationDisplay": "0 ms",
+      "artifactFolder": "AddNEWEmployeeConcurentwithTDDTest_AddNEWEmpConcurentwithTDDTest_20260521_220238363_b023faf0",
+      "healingMappingCount": 0,
+      "links": {
+        "video": "http://127.0.0.1:8765/artifacts/AddNEWEmployeeConcurentwithTDDTest_AddNEWEmpConcurentwithTDDTest_20260521_220238363_b023faf0/video/page%408eb5b98b2dd0edbd5c22c1e529b3042c.webm",
+        "trace": null,
+        "screenshot": null,
+        "logs": "http://127.0.0.1:8765/artifacts/AddNEWEmployeeConcurentwithTDDTest_AddNEWEmpConcurentwithTDDTest_20260521_220238363_b023faf0/logs/execution.log",
+        "healing": null
+      }
+    },
+    {
+      "runId": "EditEMPTest_AddEditEmployeeTest_20260521_220238363_d2a5b59a",
+      "testName": "EditEMPTest_AddEditEmployeeTest_20260521",
+      "status": "Unknown",
+      "startedUtc": "2026-05-21T16:32:38.3667081Z",
+      "finishedUtc": "2026-05-21T16:32:38.3667081Z",
+      "durationMs": 0,
+      "durationDisplay": "0 ms",
+      "artifactFolder": "EditEMPTest_AddEditEmployeeTest_20260521_220238363_d2a5b59a",
+      "healingMappingCount": 0,
+      "links": {
+        "video": "http://127.0.0.1:8765/artifacts/EditEMPTest_AddEditEmployeeTest_20260521_220238363_d2a5b59a/video/page%406d51d8527817eab9d3d9477765f3aa1f.webm",
+        "trace": null,
+        "screenshot": null,
+        "logs": "http://127.0.0.1:8765/artifacts/EditEMPTest_AddEditEmployeeTest_20260521_220238363_d2a5b59a/logs/execution.log",
+        "healing": null
+      }
+    },
+    {
+      "runId": "AddNEWEmployeeConcurentwithTDDTest_AddNEWEmpConcurentwithTDDTest_20260521_220147914_d06257ef",
+      "testName": "AddNEWEmployeeConcurentwithTDDTest_AddNEWEmpConcurentwithTDDTest_20260521",
+      "status": "Unknown",
+      "startedUtc": "2026-05-21T16:31:47.9159245Z",
+      "finishedUtc": "2026-05-21T16:31:47.9159245Z",
+      "durationMs": 0,
+      "durationDisplay": "0 ms",
+      "artifactFolder": "AddNEWEmployeeConcurentwithTDDTest_AddNEWEmpConcurentwithTDDTest_20260521_220147914_d06257ef",
+      "healingMappingCount": 0,
+      "links": {
+        "video": null,
+        "trace": null,
+        "screenshot": null,
+        "logs": "http://127.0.0.1:8765/artifacts/AddNEWEmployeeConcurentwithTDDTest_AddNEWEmpConcurentwithTDDTest_20260521_220147914_d06257ef/logs/execution.log",
+        "healing": null
+      }
+    },
+    {
+      "runId": "AISelfHeal_EditEmployee_Raj_20260521_220147913_b85d29bc",
+      "testName": "AISelfHeal_EditEmployee_Raj_20260521",
+      "status": "Unknown",
+      "startedUtc": "2026-05-21T16:31:47.9159245Z",
+      "finishedUtc": "2026-05-21T16:31:47.9159245Z",
+      "durationMs": 0,
+      "durationDisplay": "0 ms",
+      "artifactFolder": "AISelfHeal_EditEmployee_Raj_20260521_220147913_b85d29bc",
+      "healingMappingCount": 0,
+      "links": {
+        "video": null,
+        "trace": null,
+        "screenshot": null,
+        "logs": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_20260521_220147913_b85d29bc/logs/execution.log",
+        "healing": null
+      }
+    },
+    {
+      "runId": "AddNEWEmployeeConcurentwithTDDTest_AddNEWEmpConcurentwithTDDTest_20260521_220107327_70b66b48",
+      "testName": "AddNEWEmployeeConcurentwithTDDTest_AddNEWEmpConcurentwithTDDTest_20260521",
+      "status": "Unknown",
+      "startedUtc": "2026-05-21T16:31:07.3287687Z",
+      "finishedUtc": "2026-05-21T16:31:07.3287687Z",
+      "durationMs": 0,
+      "durationDisplay": "0 ms",
+      "artifactFolder": "AddNEWEmployeeConcurentwithTDDTest_AddNEWEmpConcurentwithTDDTest_20260521_220107327_70b66b48",
+      "healingMappingCount": 0,
+      "links": {
+        "video": "http://127.0.0.1:8765/artifacts/AddNEWEmployeeConcurentwithTDDTest_AddNEWEmpConcurentwithTDDTest_20260521_220107327_70b66b48/video/page%40d23330e88a80043d10c2b65e7e0004f0.webm",
+        "trace": null,
+        "screenshot": null,
+        "logs": "http://127.0.0.1:8765/artifacts/AddNEWEmployeeConcurentwithTDDTest_AddNEWEmpConcurentwithTDDTest_20260521_220107327_70b66b48/logs/execution.log",
+        "healing": null
+      }
+    },
+    {
+      "runId": "AISelfHeal_EditEmployee_Raj_20260521_220107325_212cbe0d",
+      "testName": "AISelfHeal_EditEmployee_Raj_20260521",
+      "status": "Unknown",
+      "startedUtc": "2026-05-21T16:31:07.3277688Z",
+      "finishedUtc": "2026-05-21T16:31:07.3277688Z",
+      "durationMs": 0,
+      "durationDisplay": "0 ms",
+      "artifactFolder": "AISelfHeal_EditEmployee_Raj_20260521_220107325_212cbe0d",
+      "healingMappingCount": 0,
+      "links": {
+        "video": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_20260521_220107325_212cbe0d/video/page%40728fec2928bb864eda81f1f374771a9a.webm",
+        "trace": null,
+        "screenshot": null,
+        "logs": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_20260521_220107325_212cbe0d/logs/execution.log",
+        "healing": null
+      }
+    },
+    {
+      "runId": "EditEMPTest_AddEditEmployeeTest_20260521_220045328_ea63d513",
+      "testName": "EditEMPTest_AddEditEmployeeTest_20260521",
+      "status": "Unknown",
+      "startedUtc": "2026-05-21T16:30:45.3308061Z",
+      "finishedUtc": "2026-05-21T16:30:45.3308061Z",
+      "durationMs": 0,
+      "durationDisplay": "0 ms",
+      "artifactFolder": "EditEMPTest_AddEditEmployeeTest_20260521_220045328_ea63d513",
+      "healingMappingCount": 0,
+      "links": {
+        "video": "http://127.0.0.1:8765/artifacts/EditEMPTest_AddEditEmployeeTest_20260521_220045328_ea63d513/video/page%40aea8a99c2b1aab7b50b9ed038ded0037.webm",
+        "trace": null,
+        "screenshot": null,
+        "logs": "http://127.0.0.1:8765/artifacts/EditEMPTest_AddEditEmployeeTest_20260521_220045328_ea63d513/logs/execution.log",
+        "healing": null
+      }
+    },
+    {
+      "runId": "EditEMPTest_AddEditEmployeeTest_20260521_215738084_c0247219",
+      "testName": "EditEMPTest_AddEditEmployeeTest",
       "status": "Passed",
-      "startedUtc": "2026-05-21T07:40:28.1020598Z",
-      "finishedUtc": "2026-05-21T07:41:13.5874282Z",
-      "durationMs": 45485,
-      "durationDisplay": "45.485s",
-      "artifactFolder": "AISelfHeal_EditEmployee_Raj_20260521_131028098_d4bfd7ce",
+      "startedUtc": "2026-05-21T16:28:11.2874815Z",
+      "finishedUtc": "2026-05-21T16:28:15.1267801Z",
+      "durationMs": 3839,
+      "durationDisplay": "3.839s",
+      "artifactFolder": "EditEMPTest_AddEditEmployeeTest_20260521_215738084_c0247219",
       "healingMappingCount": 2,
       "links": {
-        "video": "../Artifacts/AISelfHeal_EditEmployee_Raj_20260521_131028098_d4bfd7ce/video/page%40229e23dcadaf2d673669a84470067847.webm",
-        "trace": "../Artifacts/AISelfHeal_EditEmployee_Raj_20260521_131028098_d4bfd7ce/trace/trace.zip",
-        "screenshot": "../Artifacts/AISelfHeal_EditEmployee_Raj_20260521_131028098_d4bfd7ce/screenshots/final_20260521_131108.png",
-        "logs": "../Artifacts/AISelfHeal_EditEmployee_Raj_20260521_131028098_d4bfd7ce/logs/execution.log",
-        "healing": "../Artifacts/AISelfHeal_EditEmployee_Raj_20260521_131028098_d4bfd7ce/healing/FailedLocatorStore.json"
+        "video": "http://127.0.0.1:8765/artifacts/EditEMPTest_AddEditEmployeeTest_20260521_215738084_c0247219/video/page%408fce62560c975f54e173b1c37b44b0b5.webm",
+        "trace": "http://127.0.0.1:8765/artifacts/EditEMPTest_AddEditEmployeeTest_20260521_215738084_c0247219/trace/trace.zip",
+        "screenshot": "http://127.0.0.1:8765/artifacts/EditEMPTest_AddEditEmployeeTest_20260521_215738084_c0247219/screenshots/final_20260521_215811.png",
+        "logs": "http://127.0.0.1:8765/artifacts/EditEMPTest_AddEditEmployeeTest_20260521_215738084_c0247219/logs/execution.log",
+        "healing": "http://127.0.0.1:8765/artifacts/EditEMPTest_AddEditEmployeeTest_20260521_215738084_c0247219/healing/FailedLocatorStore.json"
+      }
+    },
+    {
+      "runId": "AddNewEmpTest_AddNewEmployeeTest_20260521_214421354_911dad42",
+      "testName": "AddNewEmpTest_AddNewEmployeeTest",
+      "status": "Passed",
+      "startedUtc": "2026-05-21T16:15:35.3568034Z",
+      "finishedUtc": "2026-05-21T16:15:42.381607Z",
+      "durationMs": 7024,
+      "durationDisplay": "7.024s",
+      "artifactFolder": "AddNewEmpTest_AddNewEmployeeTest_20260521_214421354_911dad42",
+      "healingMappingCount": 2,
+      "links": {
+        "video": "http://127.0.0.1:8765/artifacts/AddNewEmpTest_AddNewEmployeeTest_20260521_214421354_911dad42/video/page%40167e9627bf5eeb1f82788c79bd9e523b.webm",
+        "trace": "http://127.0.0.1:8765/artifacts/AddNewEmpTest_AddNewEmployeeTest_20260521_214421354_911dad42/trace/trace.zip",
+        "screenshot": "http://127.0.0.1:8765/artifacts/AddNewEmpTest_AddNewEmployeeTest_20260521_214421354_911dad42/screenshots/final_20260521_214535.png",
+        "logs": "http://127.0.0.1:8765/artifacts/AddNewEmpTest_AddNewEmployeeTest_20260521_214421354_911dad42/logs/execution.log",
+        "healing": "http://127.0.0.1:8765/artifacts/AddNewEmpTest_AddNewEmployeeTest_20260521_214421354_911dad42/healing/FailedLocatorStore.json"
+      }
+    },
+    {
+      "runId": "AddNewEMPExcelReaderTest_AddNewEmployeeTest_20260521_214051747_de923d0a",
+      "testName": "AddNewEMPExcelReaderTest_AddNewEmployeeTest_20260521",
+      "status": "Unknown",
+      "startedUtc": "2026-05-21T16:10:51.7502391Z",
+      "finishedUtc": "2026-05-21T16:10:51.7502391Z",
+      "durationMs": 0,
+      "durationDisplay": "0 ms",
+      "artifactFolder": "AddNewEMPExcelReaderTest_AddNewEmployeeTest_20260521_214051747_de923d0a",
+      "healingMappingCount": 2,
+      "links": {
+        "video": "http://127.0.0.1:8765/artifacts/AddNewEMPExcelReaderTest_AddNewEmployeeTest_20260521_214051747_de923d0a/video/page%406c5b3d04143f2c714a9bc979f9d9a78d.webm",
+        "trace": "http://127.0.0.1:8765/artifacts/AddNewEMPExcelReaderTest_AddNewEmployeeTest_20260521_214051747_de923d0a/trace/trace.zip",
+        "screenshot": "http://127.0.0.1:8765/artifacts/AddNewEMPExcelReaderTest_AddNewEmployeeTest_20260521_214051747_de923d0a/screenshots/final_20260521_214121.png",
+        "logs": "http://127.0.0.1:8765/artifacts/AddNewEMPExcelReaderTest_AddNewEmployeeTest_20260521_214051747_de923d0a/logs/execution.log",
+        "healing": "http://127.0.0.1:8765/artifacts/AddNewEMPExcelReaderTest_AddNewEmployeeTest_20260521_214051747_de923d0a/healing/FailedLocatorStore.json"
       }
     }
   ],
   "timeline": [
     {
-      "testName": "AISelfHeal_EditEmployee_Raj",
+      "testName": "AddNewEMPInlineTDDTest_AddNewEmployeeInlineTDDTest_20260521",
+      "status": "Unknown",
+      "startedUtc": "2026-05-21T16:34:20.317942Z",
+      "finishedUtc": "2026-05-21T16:34:20.317942Z",
+      "durationMs": 0
+    },
+    {
+      "testName": "AddNewEmpAutoTestDataCreationTest_AddNewEmployeeAutoTestDataCreationTest_20260521",
+      "status": "Unknown",
+      "startedUtc": "2026-05-21T16:34:08.269378Z",
+      "finishedUtc": "2026-05-21T16:34:08.269378Z",
+      "durationMs": 0
+    },
+    {
+      "testName": "AddNewEMPExcelReaderTest_AddNewEmployeeTest_20260521",
+      "status": "Unknown",
+      "startedUtc": "2026-05-21T16:33:52.9355886Z",
+      "finishedUtc": "2026-05-21T16:33:52.9355886Z",
+      "durationMs": 0
+    },
+    {
+      "testName": "AddNEWEmployeeConcurentwithTDDTest_AddNEWEmpConcurentwithTDDTest_20260521",
+      "status": "Unknown",
+      "startedUtc": "2026-05-21T16:32:38.3667081Z",
+      "finishedUtc": "2026-05-21T16:32:38.3667081Z",
+      "durationMs": 0
+    },
+    {
+      "testName": "EditEMPTest_AddEditEmployeeTest_20260521",
+      "status": "Unknown",
+      "startedUtc": "2026-05-21T16:32:38.3667081Z",
+      "finishedUtc": "2026-05-21T16:32:38.3667081Z",
+      "durationMs": 0
+    },
+    {
+      "testName": "AddNEWEmployeeConcurentwithTDDTest_AddNEWEmpConcurentwithTDDTest_20260521",
+      "status": "Unknown",
+      "startedUtc": "2026-05-21T16:31:47.9159245Z",
+      "finishedUtc": "2026-05-21T16:31:47.9159245Z",
+      "durationMs": 0
+    },
+    {
+      "testName": "AISelfHeal_EditEmployee_Raj_20260521",
+      "status": "Unknown",
+      "startedUtc": "2026-05-21T16:31:47.9159245Z",
+      "finishedUtc": "2026-05-21T16:31:47.9159245Z",
+      "durationMs": 0
+    },
+    {
+      "testName": "AddNEWEmployeeConcurentwithTDDTest_AddNEWEmpConcurentwithTDDTest_20260521",
+      "status": "Unknown",
+      "startedUtc": "2026-05-21T16:31:07.3287687Z",
+      "finishedUtc": "2026-05-21T16:31:07.3287687Z",
+      "durationMs": 0
+    },
+    {
+      "testName": "AISelfHeal_EditEmployee_Raj_20260521",
+      "status": "Unknown",
+      "startedUtc": "2026-05-21T16:31:07.3277688Z",
+      "finishedUtc": "2026-05-21T16:31:07.3277688Z",
+      "durationMs": 0
+    },
+    {
+      "testName": "EditEMPTest_AddEditEmployeeTest_20260521",
+      "status": "Unknown",
+      "startedUtc": "2026-05-21T16:30:45.3308061Z",
+      "finishedUtc": "2026-05-21T16:30:45.3308061Z",
+      "durationMs": 0
+    },
+    {
+      "testName": "EditEMPTest_AddEditEmployeeTest",
       "status": "Passed",
-      "startedUtc": "2026-05-21T07:40:28.1020598Z",
-      "finishedUtc": "2026-05-21T07:41:13.5874282Z",
-      "durationMs": 45485
+      "startedUtc": "2026-05-21T16:28:11.2874815Z",
+      "finishedUtc": "2026-05-21T16:28:15.1267801Z",
+      "durationMs": 3839
+    },
+    {
+      "testName": "AddNewEmpTest_AddNewEmployeeTest",
+      "status": "Passed",
+      "startedUtc": "2026-05-21T16:15:35.3568034Z",
+      "finishedUtc": "2026-05-21T16:15:42.381607Z",
+      "durationMs": 7024
+    },
+    {
+      "testName": "AddNewEMPExcelReaderTest_AddNewEmployeeTest_20260521",
+      "status": "Unknown",
+      "startedUtc": "2026-05-21T16:10:51.7502391Z",
+      "finishedUtc": "2026-05-21T16:10:51.7502391Z",
+      "durationMs": 0
     }
   ]
 }
 </script>
 <script>
 let lastPayload = null;
-let statusChart, runtimeChart, timelineChart, healingChart;
+let statusChart, passRateChart, runtimeChart, timelineChart, healingChart;
 const searchInput = document.getElementById('searchInput');
 const statusFilter = document.getElementById('statusFilter');
 const API_BASE = 'http://127.0.0.1:8765';
@@ -177,6 +486,8 @@ function applyPayload(data) {
   document.getElementById('kpiPassed').textContent = data.passed;
   document.getElementById('kpiFailed').textContent = data.failed;
   document.getElementById('kpiHealing').textContent = data.healingTotal;
+  document.getElementById('kpiPassRate').textContent = (data.passRatePercent ?? 0) + '%';
+  document.getElementById('kpiFailRate').textContent = (data.failRatePercent ?? 0) + '%';
   updateCharts(data);
   renderTable(data);
 }
@@ -217,6 +528,28 @@ function updateCharts(data) {
   const passed = data.passed || 0;
   const failed = data.failed || 0;
   const unknown = data.unknown || 0;
+  const passPct = data.passRatePercent ?? 0;
+  const failPct = data.failRatePercent ?? 0;
+  const unknownPct = data.unknownRatePercent ?? 0;
+
+  if (!passRateChart) {
+    passRateChart = new Chart(document.getElementById('passRateChart'), {
+      type: 'doughnut',
+      data: { labels: ['Pass %','Fail %','Unknown %'],
+        datasets: [{ data: [passPct, failPct, unknownPct],
+          backgroundColor: ['#22c55e','#ef4444','#64748b'], borderWidth: 0 }] },
+      options: {
+        plugins: {
+          legend: { position: 'bottom', labels: { color: '#e2e8f0' } },
+          tooltip: { callbacks: { label: (ctx) => ctx.label + ': ' + ctx.raw + '%' } }
+        },
+        cutout: '58%'
+      }
+    });
+  } else {
+    passRateChart.data.datasets[0].data = [passPct, failPct, unknownPct];
+    passRateChart.update('none');
+  }
 
   if (!statusChart) {
     statusChart = new Chart(document.getElementById('statusChart'), {
@@ -224,7 +557,17 @@ function updateCharts(data) {
       data: { labels: ['Passed','Failed','Unknown'],
         datasets: [{ data: [passed, failed, unknown],
           backgroundColor: ['#22c55e','#ef4444','#64748b'], borderWidth: 0 }] },
-      options: { plugins: { legend: { position: 'bottom', labels: { color: '#e2e8f0' } } }, cutout: '62%' }
+      options: {
+        plugins: {
+          legend: { position: 'bottom', labels: { color: '#e2e8f0' } },
+          tooltip: { callbacks: { label: (ctx) => {
+            const total = passed + failed + unknown;
+            const pct = total ? Math.round(100 * ctx.raw / total) : 0;
+            return ctx.label + ': ' + ctx.raw + ' (' + pct + '%)';
+          } } }
+        },
+        cutout: '62%'
+      }
     });
   } else {
     statusChart.data.datasets[0].data = [passed, failed, unknown];

@@ -6,7 +6,7 @@ namespace EaTestAutomation.Utilities
     {
         public static string GetExcelPath()
         {
-            return @"C:\DEMO Project\EaTestAutomation\TestData\TestData.xlsx";
+            return @"D:\EaAutomationFramework\EaTestAutomation\TestData\TestData.xlsx";
         }
     }
 }

@@ -17,6 +17,15 @@ namespace EAFramework.Config
         //public string Channel { get; set; }
         public DriverType DriverType { get; set; }
         public string Applicationurl { get; set; }
+
+        /// <summary>When false, xUnit runs tests sequentially (one collection at a time).</summary>
+        public bool EnableParallelExecution { get; set; }
+
+        /// <summary>Max concurrent browser sessions when parallel execution is enabled.</summary>
+        public int MaxParallelBrowsers { get; set; } = 1;
+
+        /// <summary>Reserved cap for UI tab navigation per browser (documented for operators).</summary>
+        public int MaxBrowserTabs { get; set; } = 1;
     }
 
     public enum DriverType

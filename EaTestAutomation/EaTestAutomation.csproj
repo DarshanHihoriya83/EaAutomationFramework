@@ -32,8 +32,15 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
+  <Target Name="SyncXunitRunnerFromAppSettings" BeforeTargets="BeforeBuild">
+    <Exec Command="powershell -NoProfile -ExecutionPolicy Bypass -File &quot;$(MSBuildProjectDirectory)\Scripts\Sync-XunitRunner.ps1&quot; &quot;$(MSBuildProjectDirectory)\appsettings.json&quot; &quot;$(MSBuildProjectDirectory)\xunit.runner.json&quot;" />
+  </Target>
+
   <ItemGroup>
     <None Update="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="xunit.runner.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="DashboardReport\README.md">

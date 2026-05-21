@@ -12,6 +12,9 @@ namespace EaTestAutomation.Reporting
         public int Failed { get; set; }
         public int Unknown { get; set; }
         public int HealingTotal { get; set; }
+        public double PassRatePercent { get; set; }
+        public double FailRatePercent { get; set; }
+        public double UnknownRatePercent { get; set; }
         public List<DashboardRunRow> Runs { get; set; } = new();
         public List<TimelinePoint> Timeline { get; set; } = new();
     }

@@ -10,6 +10,8 @@ namespace EaTestAutomation.Reporting
     /// </summary>
     public static class MasterDashboardGenerator
     {
+        private static readonly object WriteGate = new();
+
         private static readonly JsonSerializerOptions JsonOptions = new()
         {
             WriteIndented = true,
@@ -74,19 +76,22 @@ namespace EaTestAutomation.Reporting
 
         private static void WriteAllDashboardOutputs()
         {
-            RealtimeDashboardPayload payload = BuildLatestPayload();
-
-            foreach (string dashboardRoot in DashboardPaths.GetAllDashboardRoots())
+            lock (WriteGate)
             {
-                Directory.CreateDirectory(dashboardRoot);
+                RealtimeDashboardPayload payload = BuildLatestPayload();
 
-                File.WriteAllText(
-                    Path.Combine(dashboardRoot, "dashboard-data.json"),
-                    JsonSerializer.Serialize(payload, JsonOptions));
+                foreach (string dashboardRoot in DashboardPaths.GetAllDashboardRoots())
+                {
+                    Directory.CreateDirectory(dashboardRoot);
 
-                File.WriteAllText(
-                    Path.Combine(dashboardRoot, "index.html"),
-                    BuildShellHtml(payload));
+                    File.WriteAllText(
+                        Path.Combine(dashboardRoot, "dashboard-data.json"),
+                        JsonSerializer.Serialize(payload, JsonOptions));
+
+                    File.WriteAllText(
+                        Path.Combine(dashboardRoot, "index.html"),
+                        BuildShellHtml(payload));
+                }
             }
         }
 
@@ -110,6 +115,11 @@ namespace EaTestAutomation.Reporting
             int passed = deduped.Count(r => r.Status == "Passed");
             int failed = deduped.Count(r => r.Status == "Failed");
             int unknown = deduped.Count(r => r.Status == "Unknown");
+            int total = deduped.Count;
+
+            double passRate = total > 0 ? Math.Round(100.0 * passed / total, 1) : 0;
+            double failRate = total > 0 ? Math.Round(100.0 * failed / total, 1) : 0;
+            double unknownRate = total > 0 ? Math.Round(100.0 * unknown / total, 1) : 0;
 
             var runs = deduped
                 .OrderByDescending(h => h.FinishedUtc)
@@ -142,11 +152,11 @@ namespace EaTestAutomation.Reporting
                             ? new DashboardRunLinks()
                             : new DashboardRunLinks
                             {
-                                Video = ToRelativeHref(dashboardRoot, info.VideoFilePath),
-                                Trace = ToRelativeHref(dashboardRoot, info.TraceFilePath),
-                                Screenshot = ToRelativeHref(dashboardRoot, info.ScreenshotFilePath),
-                                Logs = ToRelativeHref(dashboardRoot, info.LogFilePath),
-                                Healing = ToRelativeHref(dashboardRoot, info.HealingStorePath)
+                                Video = ToArtifactUrl(info.VideoFilePath),
+                                Trace = ToArtifactUrl(info.TraceFilePath),
+                                Screenshot = ToArtifactUrl(info.ScreenshotFilePath),
+                                Logs = ToArtifactUrl(info.LogFilePath),
+                                Healing = ToArtifactUrl(info.HealingStorePath)
                             }
                     };
                 })
@@ -168,11 +178,14 @@ namespace EaTestAutomation.Reporting
             {
                 UpdatedUtc = DateTime.UtcNow,
                 DashboardUrl = DashboardReportServer.BaseUrl,
-                Total = deduped.Count,
+                Total = total,
                 Passed = passed,
                 Failed = failed,
                 Unknown = unknown,
                 HealingTotal = deduped.Sum(r => r.HealingMappingCount),
+                PassRatePercent = passRate,
+                FailRatePercent = failRate,
+                UnknownRatePercent = unknownRate,
                 Runs = runs,
                 Timeline = timeline
             };
@@ -281,6 +294,21 @@ namespace EaTestAutomation.Reporting
 
                 if (existing == null)
                 {
+                    history.Add(new TestRunRecord
+                    {
+                        RunId = run.FolderName,
+                        TestName = run.DisplayName,
+                        ArtifactFolder = run.FolderName,
+                        Status = "Unknown",
+                        StartedUtc = run.LastWriteUtc,
+                        FinishedUtc = run.LastWriteUtc,
+                        DurationMs = 0,
+                        HasVideo = run.HasVideo,
+                        HasTrace = run.HasTrace,
+                        HasScreenshot = run.HasScreenshot,
+                        HealingMappingCount = run.HealingMappingCount
+                    });
+
                     continue;
                 }
 
@@ -396,28 +424,34 @@ namespace EaTestAutomation.Reporting
             return Directory.EnumerateFiles(directory, pattern).FirstOrDefault();
         }
 
-        private static string? ToRelativeHref(string dashboardRoot, string? absolutePath)
+        /// <summary>
+        /// Builds an HTTP URL served by <see cref="DashboardReportServer"/> under <c>/artifacts/</c>.
+        /// </summary>
+        private static string? ToArtifactUrl(string? absolutePath)
         {
             if (string.IsNullOrWhiteSpace(absolutePath) || !File.Exists(absolutePath))
             {
                 return null;
             }
 
-            string rel = Path.GetRelativePath(
-                Path.GetFullPath(dashboardRoot),
-                Path.GetFullPath(absolutePath));
+            string artifactsRoot = Path.GetFullPath(DashboardPaths.ResolveArtifactsRoot());
+            string fullPath = Path.GetFullPath(absolutePath);
 
-            return EncodeHref(rel);
-        }
+            if (!fullPath.StartsWith(artifactsRoot, StringComparison.OrdinalIgnoreCase))
+            {
+                return null;
+            }
 
-        private static string EncodeHref(string relativePath)
-        {
-            return string.Join(
+            string relative = Path.GetRelativePath(artifactsRoot, fullPath)
+                .Replace('\\', '/');
+
+            string encoded = string.Join(
                 "/",
-                relativePath
-                    .Replace('\\', '/')
+                relative
                     .Split('/', StringSplitOptions.RemoveEmptyEntries)
                     .Select(Uri.EscapeDataString));
+
+            return $"{DashboardReportServer.BaseUrl}artifacts/{encoded}";
         }
 
         private static string BuildShellHtml(RealtimeDashboardPayload payload)
@@ -446,14 +480,17 @@ namespace EaTestAutomation.Reporting
             sb.AppendLine("</div>");
             sb.AppendLine("</header>");
 
-            sb.AppendLine("<section class='kpi-grid'>");
+            sb.AppendLine("<section class='kpi-grid kpi-grid-6'>");
             sb.AppendLine("<div class='kpi kpi-blue'><div class='kpi-value' id='kpiTotal'>—</div><div class='kpi-label'>Total runs</div></div>");
             sb.AppendLine("<div class='kpi kpi-green'><div class='kpi-value' id='kpiPassed'>—</div><div class='kpi-label'>Passed</div></div>");
             sb.AppendLine("<div class='kpi kpi-red'><div class='kpi-value' id='kpiFailed'>—</div><div class='kpi-label'>Failed</div></div>");
+            sb.AppendLine("<div class='kpi kpi-purple'><div class='kpi-value' id='kpiPassRate'>—</div><div class='kpi-label'>Pass rate</div></div>");
+            sb.AppendLine("<div class='kpi kpi-slate'><div class='kpi-value' id='kpiFailRate'>—</div><div class='kpi-label'>Fail rate</div></div>");
             sb.AppendLine("<div class='kpi kpi-amber'><div class='kpi-value' id='kpiHealing'>—</div><div class='kpi-label'>Healed locators</div></div>");
             sb.AppendLine("</section>");
 
-            sb.AppendLine("<section class='charts-grid charts-grid-4'>");
+            sb.AppendLine("<section class='charts-grid charts-grid-5'>");
+            sb.AppendLine("<div class='card chart-card'><h2>Pass / fail %</h2><canvas id='passRateChart'></canvas></div>");
             sb.AppendLine("<div class='card chart-card'><h2>Test status</h2><canvas id='statusChart'></canvas></div>");
             sb.AppendLine("<div class='card chart-card'><h2>Run duration</h2><canvas id='runtimeChart'></canvas></div>");
             sb.AppendLine("<div class='card chart-card'><h2>Execution timeline</h2><canvas id='timelineChart'></canvas></div>");
@@ -493,7 +530,7 @@ namespace EaTestAutomation.Reporting
 
         private static string ClientScript() => """
             let lastPayload = null;
-            let statusChart, runtimeChart, timelineChart, healingChart;
+            let statusChart, passRateChart, runtimeChart, timelineChart, healingChart;
             const searchInput = document.getElementById('searchInput');
             const statusFilter = document.getElementById('statusFilter');
             const API_BASE = 'http://127.0.0.1:8765';
@@ -536,6 +573,8 @@ namespace EaTestAutomation.Reporting
               document.getElementById('kpiPassed').textContent = data.passed;
               document.getElementById('kpiFailed').textContent = data.failed;
               document.getElementById('kpiHealing').textContent = data.healingTotal;
+              document.getElementById('kpiPassRate').textContent = (data.passRatePercent ?? 0) + '%';
+              document.getElementById('kpiFailRate').textContent = (data.failRatePercent ?? 0) + '%';
               updateCharts(data);
               renderTable(data);
             }
@@ -576,6 +615,28 @@ namespace EaTestAutomation.Reporting
               const passed = data.passed || 0;
               const failed = data.failed || 0;
               const unknown = data.unknown || 0;
+              const passPct = data.passRatePercent ?? 0;
+              const failPct = data.failRatePercent ?? 0;
+              const unknownPct = data.unknownRatePercent ?? 0;
+
+              if (!passRateChart) {
+                passRateChart = new Chart(document.getElementById('passRateChart'), {
+                  type: 'doughnut',
+                  data: { labels: ['Pass %','Fail %','Unknown %'],
+                    datasets: [{ data: [passPct, failPct, unknownPct],
+                      backgroundColor: ['#22c55e','#ef4444','#64748b'], borderWidth: 0 }] },
+                  options: {
+                    plugins: {
+                      legend: { position: 'bottom', labels: { color: '#e2e8f0' } },
+                      tooltip: { callbacks: { label: (ctx) => ctx.label + ': ' + ctx.raw + '%' } }
+                    },
+                    cutout: '58%'
+                  }
+                });
+              } else {
+                passRateChart.data.datasets[0].data = [passPct, failPct, unknownPct];
+                passRateChart.update('none');
+              }
 
               if (!statusChart) {
                 statusChart = new Chart(document.getElementById('statusChart'), {
@@ -583,7 +644,17 @@ namespace EaTestAutomation.Reporting
                   data: { labels: ['Passed','Failed','Unknown'],
                     datasets: [{ data: [passed, failed, unknown],
                       backgroundColor: ['#22c55e','#ef4444','#64748b'], borderWidth: 0 }] },
-                  options: { plugins: { legend: { position: 'bottom', labels: { color: '#e2e8f0' } } }, cutout: '62%' }
+                  options: {
+                    plugins: {
+                      legend: { position: 'bottom', labels: { color: '#e2e8f0' } },
+                      tooltip: { callbacks: { label: (ctx) => {
+                        const total = passed + failed + unknown;
+                        const pct = total ? Math.round(100 * ctx.raw / total) : 0;
+                        return ctx.label + ': ' + ctx.raw + ' (' + pct + '%)';
+                      } } }
+                    },
+                    cutout: '62%'
+                  }
                 });
               } else {
                 statusChart.data.datasets[0].data = [passed, failed, unknown];
@@ -729,13 +800,16 @@ namespace EaTestAutomation.Reporting
             .live-dot { width:8px; height:8px; border-radius:50%; background:#22c55e; animation:pulse 1.5s infinite; }
             @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
             .kpi-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:16px; padding:24px 32px; }
+            .kpi-grid-6 { grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); }
             .kpi { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:20px; }
             .kpi-value { font-size:2rem; font-weight:700; }
             .kpi-label { color:var(--muted); margin-top:4px; font-size:.9rem; }
             .kpi-green .kpi-value { color:#22c55e; } .kpi-red .kpi-value { color:#ef4444; }
             .kpi-blue .kpi-value { color:#38bdf8; } .kpi-amber .kpi-value { color:#f59e0b; }
+            .kpi-purple .kpi-value { color:#a78bfa; } .kpi-slate .kpi-value { color:#94a3b8; }
             .charts-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:20px; padding:0 32px 24px; }
             .charts-grid-4 { grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); }
+            .charts-grid-5 { grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); }
             .kpi { cursor:pointer; }
             .btn-delete { background:#7f1d1d; color:#fecaca; border:1px solid #991b1b; border-radius:6px; padding:6px 12px; cursor:pointer; font-size:.8rem; }
             .btn-delete:hover { background:#991b1b; }

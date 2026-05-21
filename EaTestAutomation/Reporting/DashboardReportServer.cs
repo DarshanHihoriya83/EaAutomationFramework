@@ -41,6 +41,14 @@ namespace EaTestAutomation.Reporting
                     };
                     _thread.Start();
                 }
+                catch (HttpListenerException ex) when (
+                    ex.Message.Contains("conflicts with an existing registration", StringComparison.OrdinalIgnoreCase)
+                    || ex.NativeErrorCode == 183)
+                {
+                    // Another test process or dashboard host already owns this URL prefix.
+                    _listener = null;
+                    _running = true;
+                }
                 catch (Exception ex)
                 {
                     _running = false;
@@ -175,6 +183,13 @@ namespace EaTestAutomation.Reporting
                     return;
                 }
 
+                if (path.StartsWith("/artifacts/", StringComparison.OrdinalIgnoreCase))
+                {
+                    string relative = path["/artifacts/".Length..];
+                    ServeArtifactFile(relative, res);
+                    return;
+                }
+
                 ServeStaticFile(path, res);
             }
             catch
@@ -182,6 +197,28 @@ namespace EaTestAutomation.Reporting
                 res.StatusCode = 500;
                 res.Close();
             }
+        }
+
+        private static void ServeArtifactFile(string urlRelativePath, HttpListenerResponse res)
+        {
+            string artifactsRoot = Path.GetFullPath(DashboardPaths.ResolveArtifactsRoot());
+            string decoded = Uri.UnescapeDataString(urlRelativePath.Replace('/', Path.DirectorySeparatorChar));
+            string fullPath = Path.GetFullPath(Path.Combine(artifactsRoot, decoded));
+
+            if (!fullPath.StartsWith(artifactsRoot, StringComparison.OrdinalIgnoreCase)
+                || !File.Exists(fullPath))
+            {
+                res.StatusCode = 404;
+                res.Close();
+                return;
+            }
+
+            byte[] content = File.ReadAllBytes(fullPath);
+            res.ContentType = GetContentType(fullPath);
+            res.AddHeader("Content-Disposition", $"inline; filename=\"{Path.GetFileName(fullPath)}\"");
+            res.StatusCode = 200;
+            res.OutputStream.Write(content, 0, content.Length);
+            res.Close();
         }
 
         private static void ServeStaticFile(string path, HttpListenerResponse res)
@@ -219,6 +256,12 @@ namespace EaTestAutomation.Reporting
                 ".json" => "application/json",
                 ".js" => "text/javascript",
                 ".css" => "text/css",
+                ".png" => "image/png",
+                ".jpg" or ".jpeg" => "image/jpeg",
+                ".webm" => "video/webm",
+                ".mp4" => "video/mp4",
+                ".zip" => "application/zip",
+                ".txt" or ".log" => "text/plain; charset=utf-8",
                 _ => "application/octet-stream"
             };
 

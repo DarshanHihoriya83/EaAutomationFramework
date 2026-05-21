@@ -1,42 +1,63 @@
-﻿using AutoFixture.Xunit2;
+﻿using EAFramework.Reporting;
 using EaTestAutomation.Base;
 using EaTestAutomation.Models;
 using EaTestAutomation.Pages;
+using EaTestAutomation.Parallel;
 using EaTestAutomation.TestData;
-using Xunit;
+using Microsoft.Playwright;
 
 namespace EaTestAutomation.Test
 {
+    /// <summary>
+    /// Data-driven employee creation. When <c>EnableParallelExecution</c> is true,
+    /// opens up to <c>MaxParallelBrowsers</c> Chrome windows at the same time.
+    /// </summary>
     public class AddNEWEmployeeConcurentwithTDDTest : BaseTest
     {
-        [Theory]
-        [MemberData(nameof(NewEmployeeData.EmployeeData),
-         MemberType = typeof(NewEmployeeData))]
-        public async Task AddNEWEmpConcurentwithTDDTest(NewEmployee employee)
+        [Fact]
+        public async Task AddNEWEmpConcurentwithTDDTest()
         {
-            AddNEWEmployeeConcurentwithTDD _AddNEWEmployeeConcurentwithTDD =  new AddNEWEmployeeConcurentwithTDD(Page);
+            List<NewEmployee> employees = NewEmployeeData.EmployeeData
+                .Select(row => (NewEmployee)row[0])
+                .ToList();
 
-            await Page.GotoAsync(_testSettings.Applicationurl);
+            if (_testSettings.EnableParallelExecution)
+            {
+                await ParallelTestOrchestrator.RunEmployeeCasesAsync(
+                    _testSettings,
+                    nameof(AddNEWEmpConcurentwithTDDTest),
+                    employees,
+                    (employee, _) => ArtifactDirectoryBuilder.Sanitize(employee.name),
+                    ExecuteEmployeeFlowAsync);
+            }
+            else
+            {
+                foreach (NewEmployee employee in employees)
+                {
+                    await ExecuteEmployeeFlowAsync(Page, employee);
+                }
+            }
 
-            await _AddNEWEmployeeConcurentwithTDD.ClickonEmployeeButton();
+            MarkTestPassed(true);
+        }
 
-            await _AddNEWEmployeeConcurentwithTDD.ClickonNewEmployeeButton();
+        private async Task ExecuteEmployeeFlowAsync(IPage page, NewEmployee employee)
+        {
+            var pageObject = new AddNEWEmployeeConcurentwithTDD(page);
 
-            await _AddNEWEmployeeConcurentwithTDD.FillFullname(employee.name);
+            await page.GotoAsync(_testSettings.Applicationurl);
 
-            await _AddNEWEmployeeConcurentwithTDD.FillAge(employee.age);
-
-            await _AddNEWEmployeeConcurentwithTDD.FillSalaryInput(employee.salary);
-
-            await _AddNEWEmployeeConcurentwithTDD.FillDurationWorkedInput(employee.durationworked);
-
-            await _AddNEWEmployeeConcurentwithTDD.SelectDropdownOptionAsync(
+            await pageObject.ClickonEmployeeButton();
+            await pageObject.ClickonNewEmployeeButton();
+            await pageObject.FillFullname(employee.name);
+            await pageObject.FillAge(employee.age);
+            await pageObject.FillSalaryInput(employee.salary);
+            await pageObject.FillDurationWorkedInput(employee.durationworked);
+            await pageObject.SelectDropdownOptionAsync(
                 "#Grade",
                 employee.EmployeeList.ToString());
-
-            await _AddNEWEmployeeConcurentwithTDD.FillEmailInput(employee.email);
-
-            await _AddNEWEmployeeConcurentwithTDD.ClickonCreateEmployeeButton();
+            await pageObject.FillEmailInput(employee.email);
+            await pageObject.ClickonCreateEmployeeButton();
         }
     }
 }

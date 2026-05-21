@@ -3,6 +3,7 @@ using EAFramework.Config;
 using EAFramework.Driver;
 using EAFramework.Reporting;
 using EaTestAutomation.Pages;
+using EaTestAutomation.Parallel;
 using EaTestAutomation.Reporting;
 using Microsoft.Playwright;
 using AventStack.ExtentReports;
@@ -33,6 +34,7 @@ namespace EaTestAutomation.Base
         private string _reportTestName = "";
         private DateTime _reportStartedUtc;
         private bool? _reportPassed;
+        private bool _browserGateHeld;
 
         protected IPage Page => EnsurePlaywrightSession().Page.Result;
 
@@ -77,6 +79,12 @@ namespace EaTestAutomation.Base
                 if (_playwrightDriver != null)
                 {
                     return _playwrightDriver;
+                }
+
+                if (!_browserGateHeld)
+                {
+                    BrowserExecutionGate.Acquire();
+                    _browserGateHeld = true;
                 }
 
                 string identity =
@@ -157,7 +165,7 @@ namespace EaTestAutomation.Base
                     string shotDir = Path.Combine(ArtifactRoot, "screenshots");
                     Directory.CreateDirectory(shotDir);
 
-                    bool failed = TestArtifactScope.Passed == false;
+                    bool failed = capturedPassed == false;
                     string prefix = failed ? "failure" : "final";
                     string shotPath = Path.Combine(
                         shotDir,
@@ -192,7 +200,7 @@ namespace EaTestAutomation.Base
 
                 LocatorHealingArtifactExporter.CopyHealingArtifacts(ArtifactRoot);
 
-                if (TestArtifactScope.Passed != false)
+                if (capturedPassed != false)
                 {
                     _extentTest?.Pass("Test completed; see artifact folder for trace/video/logs.");
                 }
@@ -208,6 +216,13 @@ namespace EaTestAutomation.Base
             {
                 _playwrightDriver?.Dispose();
                 _executionLog?.Dispose();
+
+                if (_browserGateHeld)
+                {
+                    BrowserExecutionGate.Release();
+                    _browserGateHeld = false;
+                }
+
                 RecordTestRunForDashboard(capturedIdentity, capturedPassed, capturedStarted);
                 ExtentReportManager.Flush();
                 MasterDashboardGenerator.Generate();

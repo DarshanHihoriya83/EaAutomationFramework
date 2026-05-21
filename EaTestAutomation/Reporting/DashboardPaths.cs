@@ -37,7 +37,6 @@ namespace EaTestAutomation.Reporting
         {
             return GetDashboardRootCandidates()
                 .Select(root => Path.Combine(root, "test-results.json"))
-                .Where(File.Exists)
                 .Distinct(StringComparer.OrdinalIgnoreCase)
                 .ToList();
         }
