@@ -1,15 +1,33 @@
 {
-  "updatedUtc": "2026-05-21T17:10:49.7394956Z",
+  "updatedUtc": "2026-05-21T17:22:49.7597153Z",
   "dashboardUrl": "http://127.0.0.1:8765/",
-  "total": 34,
-  "passed": 6,
+  "total": 35,
+  "passed": 7,
   "failed": 1,
   "unknown": 27,
-  "healingTotal": 32,
-  "passRatePercent": 17.6,
+  "healingTotal": 34,
+  "passRatePercent": 20,
   "failRatePercent": 2.9,
-  "unknownRatePercent": 79.4,
+  "unknownRatePercent": 77.1,
   "runs": [
+    {
+      "runId": "AddNewEmpTest_AddNewEmployeeTest_20260521_224940781_2985dc62",
+      "testName": "AddNewEmpTest_AddNewEmployeeTest",
+      "status": "Passed",
+      "startedUtc": "2026-05-21T17:20:22.7431308Z",
+      "finishedUtc": "2026-05-21T17:20:26.5923728Z",
+      "durationMs": 3849,
+      "durationDisplay": "3.849s",
+      "artifactFolder": "AddNewEmpTest_AddNewEmployeeTest_20260521_224940781_2985dc62",
+      "healingMappingCount": 2,
+      "links": {
+        "video": "http://127.0.0.1:8765/artifacts/AddNewEmpTest_AddNewEmployeeTest_20260521_224940781_2985dc62/video/page%4041d08fd6ef30648bf343d5fbb12b7c60.webm",
+        "trace": "http://127.0.0.1:8765/artifacts/AddNewEmpTest_AddNewEmployeeTest_20260521_224940781_2985dc62/trace/trace.zip",
+        "screenshot": "http://127.0.0.1:8765/artifacts/AddNewEmpTest_AddNewEmployeeTest_20260521_224940781_2985dc62/screenshots/final_20260521_225022.png",
+        "logs": "http://127.0.0.1:8765/artifacts/AddNewEmpTest_AddNewEmployeeTest_20260521_224940781_2985dc62/logs/execution.log",
+        "healing": "http://127.0.0.1:8765/artifacts/AddNewEmpTest_AddNewEmployeeTest_20260521_224940781_2985dc62/healing/FailedLocatorStore.json"
+      }
+    },
     {
       "runId": "EditEMPTest_AddEditEmployeeTest_20260521_223817670_b70d5623",
       "testName": "EditEMPTest_AddEditEmployeeTest",
@@ -624,6 +642,13 @@
     }
   ],
   "timeline": [
+    {
+      "testName": "AddNewEmpTest_AddNewEmployeeTest",
+      "status": "Passed",
+      "startedUtc": "2026-05-21T17:20:22.7431308Z",
+      "finishedUtc": "2026-05-21T17:20:26.5923728Z",
+      "durationMs": 3849
+    },
     {
       "testName": "EditEMPTest_AddEditEmployeeTest",
       "status": "Passed",

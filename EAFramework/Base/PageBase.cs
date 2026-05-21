@@ -4,7 +4,7 @@ using Microsoft.Playwright;
 
 namespace EAFramework.Base
 {
-    public class PageBase
+    public partial class PageBase
     {
         #region ===== VARIABLES =====
 

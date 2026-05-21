@@ -1,40 +1,25 @@
-﻿using Microsoft.Playwright;
+﻿using EAFramework.Base;
+using Microsoft.Playwright;
 
-public class LoginPage
+namespace EaTestAutomation.Pages
 {
-    private readonly IPage _page;
-
-    public LoginPage(IPage page)
+    public class LoginPage : PageBase
     {
-        _page = page;
+        public LoginPage(IPage page) : base(page) { }
+
+        private ILocator Navbar => Locator("nav");
+        private ILocator LoginButton => Navbar.Locator("//a[text()='Login']");
+        private ILocator Form => Locator("form");
+        private ILocator Username => Form.GetByPlaceholder("Enter your username");
+        private ILocator Password => Form.GetByPlaceholder("Enter your password");
+        private ILocator SignInButton => Form.Locator("button:has-text('Sign In')");
+
+        public async Task ClickOnLoginButton() => await ClickAsync(LoginButton);
+
+        public async Task FillUsername() => await FillAsync(Username, "admin");
+
+        public async Task FillPassword() => await FillAsync(Password, "password");
+
+        public async Task ClickOnSignInButton() => await ClickAsync(SignInButton);
     }
-
-    private ILocator Navbar => _page.Locator("nav");
-    private ILocator LoginButton => Navbar.Locator("//a[text()='Login']");
-    private ILocator Form => _page.Locator("form");
-    private ILocator Username => Form.GetByPlaceholder("Enter your username");
-    private ILocator Password => Form.GetByPlaceholder("Enter your password");
-    private ILocator SignInButton => Form.Locator("button:has-text('Sign In')");
-
-
-    public async Task ClickOnLoginButton()
-    {
-        await LoginButton.ClickAsync();
-    }
-
-    public async Task FillUsername()
-    {
-        await Username.FillAsync("admin");
-    }
-
-    public async Task FillPassword()
-    {
-        await Password.FillAsync("password");
-    }
-
-    public async Task ClickOnSignInButton()
-    {
-        await SignInButton.ClickAsync();       
-    }
-
 }
