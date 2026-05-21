@@ -5,12 +5,55 @@ using System.Text.Json;
 namespace EaTestAutomation.Reporting
 {
     /// <summary>
-    /// Builds the unified master dashboard under <c>DashboardReport/index.html</c>
-    /// with charts and links to Extent, per-test, video, trace, healing, and logs.
+    /// Builds the single framework report at <c>DashboardReport/index.html</c>
+    /// with real-time charts, search, filters, and artifact links (polls <c>dashboard-data.json</c>).
     /// </summary>
     public static class MasterDashboardGenerator
     {
+        private static readonly JsonSerializerOptions JsonOptions = new()
+        {
+            WriteIndented = true,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        };
+
         public static void Generate()
+        {
+            DashboardReportServer.EnsureStarted();
+            WriteAllDashboardOutputs();
+        }
+
+        /// <summary>
+        /// Rebuilds JSON from disk (called on each live API poll while the server is running).
+        /// </summary>
+        public static RealtimeDashboardPayload RefreshLivePayload()
+        {
+            RealtimeDashboardPayload payload = BuildLatestPayload();
+            string primaryRoot = DashboardPaths.ResolveDashboardRoot();
+            Directory.CreateDirectory(primaryRoot);
+
+            string json = JsonSerializer.Serialize(payload, JsonOptions);
+            File.WriteAllText(Path.Combine(primaryRoot, "dashboard-data.json"), json);
+
+            foreach (string root in DashboardPaths.GetAllDashboardRoots())
+            {
+                if (!string.Equals(root, primaryRoot, StringComparison.OrdinalIgnoreCase))
+                {
+                    try
+                    {
+                        Directory.CreateDirectory(root);
+                        File.WriteAllText(Path.Combine(root, "dashboard-data.json"), json);
+                    }
+                    catch
+                    {
+                        // best-effort mirror
+                    }
+                }
+            }
+
+            return payload;
+        }
+
+        private static RealtimeDashboardPayload BuildLatestPayload()
         {
             string artifactsRoot = DashboardPaths.ResolveArtifactsRoot();
             Directory.CreateDirectory(artifactsRoot);
@@ -23,37 +66,199 @@ namespace EaTestAutomation.Reporting
 
             MergeHistoryWithArtifacts(history, artifactRuns);
 
-            var chartData = new DashboardChartData
-            {
-                Passed = history.Count(r => r.Status == "Passed"),
-                Failed = history.Count(r => r.Status == "Failed"),
-                Unknown = history.Count(r => r.Status != "Passed" && r.Status != "Failed"),
-                RecentRuns = history
-                    .OrderByDescending(r => r.FinishedUtc)
-                    .Take(15)
-                    .Select(r => new { r.TestName, r.Status, r.FinishedUtc })
-                    .ToList(),
-                HealingCounts = artifactRuns
-                    .Select(r => new { r.FolderName, r.HealingMappingCount })
-                    .ToList()
-            };
+            return BuildPayload(
+                history,
+                artifactByFolder,
+                DashboardPaths.ResolveDashboardRoot());
+        }
+
+        private static void WriteAllDashboardOutputs()
+        {
+            RealtimeDashboardPayload payload = BuildLatestPayload();
 
             foreach (string dashboardRoot in DashboardPaths.GetAllDashboardRoots())
             {
                 Directory.CreateDirectory(dashboardRoot);
 
-                string html = BuildMasterHtml(
-                    history,
-                    artifactByFolder,
-                    dashboardRoot,
-                    artifactsRoot);
-
-                File.WriteAllText(Path.Combine(dashboardRoot, "index.html"), html);
-
                 File.WriteAllText(
                     Path.Combine(dashboardRoot, "dashboard-data.json"),
-                    JsonSerializer.Serialize(chartData, new JsonSerializerOptions { WriteIndented = true }));
+                    JsonSerializer.Serialize(payload, JsonOptions));
+
+                File.WriteAllText(
+                    Path.Combine(dashboardRoot, "index.html"),
+                    BuildShellHtml(payload));
             }
+        }
+
+        private static RealtimeDashboardPayload BuildPayload(
+            List<TestRunRecord> history,
+            Dictionary<string, ArtifactRunInfo> artifactByFolder,
+            string dashboardRoot)
+        {
+            var deduped = history
+                .GroupBy(h => h.ArtifactFolder, StringComparer.OrdinalIgnoreCase)
+                .Select(g => g.OrderByDescending(x => x.FinishedUtc).First())
+                .ToList();
+
+            string artifactsRoot = DashboardPaths.ResolveArtifactsRoot();
+
+            foreach (TestRunRecord row in deduped)
+            {
+                row.Status = NormalizeStatus(row, artifactsRoot);
+            }
+
+            int passed = deduped.Count(r => r.Status == "Passed");
+            int failed = deduped.Count(r => r.Status == "Failed");
+            int unknown = deduped.Count(r => r.Status == "Unknown");
+
+            var runs = deduped
+                .OrderByDescending(h => h.FinishedUtc)
+                .Take(100)
+                .Select(row =>
+                {
+                    artifactByFolder.TryGetValue(row.ArtifactFolder, out ArtifactRunInfo? info);
+
+                    DateTime? started = row.StartedUtc == default ? null : row.StartedUtc;
+                    DateTime? finished = row.FinishedUtc == default ? null : row.FinishedUtc;
+                    long durationMs = row.DurationMs;
+
+                    if (durationMs <= 0 && started.HasValue && finished.HasValue)
+                    {
+                        durationMs = Math.Max(0, (long)(finished.Value - started.Value).TotalMilliseconds);
+                    }
+
+                    return new DashboardRunRow
+                    {
+                        RunId = string.IsNullOrWhiteSpace(row.RunId) ? row.ArtifactFolder : row.RunId,
+                        TestName = row.TestName,
+                        Status = row.Status,
+                        StartedUtc = started,
+                        FinishedUtc = finished,
+                        DurationMs = durationMs,
+                        DurationDisplay = FormatDuration(durationMs),
+                        ArtifactFolder = row.ArtifactFolder,
+                        HealingMappingCount = row.HealingMappingCount,
+                        Links = info == null
+                            ? new DashboardRunLinks()
+                            : new DashboardRunLinks
+                            {
+                                Video = ToRelativeHref(dashboardRoot, info.VideoFilePath),
+                                Trace = ToRelativeHref(dashboardRoot, info.TraceFilePath),
+                                Screenshot = ToRelativeHref(dashboardRoot, info.ScreenshotFilePath),
+                                Logs = ToRelativeHref(dashboardRoot, info.LogFilePath),
+                                Healing = ToRelativeHref(dashboardRoot, info.HealingStorePath)
+                            }
+                    };
+                })
+                .ToList();
+
+            var timeline = runs
+                .Where(r => r.StartedUtc.HasValue && r.FinishedUtc.HasValue)
+                .Select(r => new TimelinePoint
+                {
+                    TestName = r.TestName,
+                    Status = r.Status,
+                    StartedUtc = r.StartedUtc!.Value,
+                    FinishedUtc = r.FinishedUtc!.Value,
+                    DurationMs = r.DurationMs
+                })
+                .ToList();
+
+            return new RealtimeDashboardPayload
+            {
+                UpdatedUtc = DateTime.UtcNow,
+                DashboardUrl = DashboardReportServer.BaseUrl,
+                Total = deduped.Count,
+                Passed = passed,
+                Failed = failed,
+                Unknown = unknown,
+                HealingTotal = deduped.Sum(r => r.HealingMappingCount),
+                Runs = runs,
+                Timeline = timeline
+            };
+        }
+
+        private static string NormalizeStatus(TestRunRecord row, string artifactsRoot)
+        {
+            if (row.Status.Equals("Passed", StringComparison.OrdinalIgnoreCase))
+            {
+                return "Passed";
+            }
+
+            if (row.Status.Equals("Failed", StringComparison.OrdinalIgnoreCase))
+            {
+                return "Failed";
+            }
+
+            if (ArtifactHasFailureEvidence(artifactsRoot, row.ArtifactFolder))
+            {
+                return "Failed";
+            }
+
+            return "Unknown";
+        }
+
+        private static bool ArtifactHasFailureEvidence(string artifactsRoot, string artifactFolder)
+        {
+            if (string.IsNullOrWhiteSpace(artifactFolder))
+            {
+                return false;
+            }
+
+            string root = Path.Combine(artifactsRoot, artifactFolder);
+            string shotDir = Path.Combine(root, "screenshots");
+
+            if (Directory.Exists(shotDir)
+                && Directory.EnumerateFiles(shotDir, "failure_*.png").Any())
+            {
+                return true;
+            }
+
+            string logPath = Path.Combine(root, "logs", "execution.log");
+
+            if (File.Exists(logPath))
+            {
+                try
+                {
+                    string log = File.ReadAllText(logPath);
+
+                    if (log.Contains("Test failed", StringComparison.OrdinalIgnoreCase)
+                        || log.Contains("Assert.", StringComparison.OrdinalIgnoreCase)
+                        || log.Contains("PlaywrightException", StringComparison.OrdinalIgnoreCase)
+                        || log.Contains("Screenshot skipped", StringComparison.OrdinalIgnoreCase))
+                    {
+                        return true;
+                    }
+                }
+                catch
+                {
+                    // log may be locked during an active run
+                }
+            }
+
+            return false;
+        }
+
+        private static string FormatDuration(long durationMs)
+        {
+            if (durationMs < 1000)
+            {
+                return $"{durationMs} ms";
+            }
+
+            var span = TimeSpan.FromMilliseconds(durationMs);
+
+            if (span.TotalHours >= 1)
+            {
+                return $"{(int)span.TotalHours}h {span.Minutes}m {span.Seconds}s";
+            }
+
+            if (span.TotalMinutes >= 1)
+            {
+                return $"{span.Minutes}m {span.Seconds}s";
+            }
+
+            return $"{span.Seconds}.{span.Milliseconds:D3}s";
         }
 
         private static void MergeHistoryWithArtifacts(
@@ -62,6 +267,11 @@ namespace EaTestAutomation.Reporting
         {
             foreach (ArtifactRunInfo run in artifactRuns)
             {
+                if (!run.HasExecutionArtifacts)
+                {
+                    continue;
+                }
+
                 TestRunRecord? existing = history
                     .FirstOrDefault(h =>
                         string.Equals(
@@ -71,25 +281,13 @@ namespace EaTestAutomation.Reporting
 
                 if (existing == null)
                 {
-                    history.Add(new TestRunRecord
-                    {
-                        TestName = run.DisplayName,
-                        ArtifactFolder = run.FolderName,
-                        Status = "Unknown",
-                        FinishedUtc = run.LastWriteUtc,
-                        HasVideo = run.HasVideo,
-                        HasTrace = run.HasTrace,
-                        HasScreenshot = run.HasScreenshot,
-                        HealingMappingCount = run.HealingMappingCount
-                    });
+                    continue;
                 }
-                else
-                {
-                    existing.HasVideo = run.HasVideo;
-                    existing.HasTrace = run.HasTrace;
-                    existing.HasScreenshot = run.HasScreenshot;
-                    existing.HealingMappingCount = run.HealingMappingCount;
-                }
+
+                existing.HasVideo = run.HasVideo;
+                existing.HasTrace = run.HasTrace;
+                existing.HasScreenshot = run.HasScreenshot;
+                existing.HealingMappingCount = run.HealingMappingCount;
             }
         }
 
@@ -118,10 +316,11 @@ namespace EaTestAutomation.Reporting
                     Path.Combine(dir, "screenshots"),
                     "*.png");
 
-                string dashboardHtml = Path.Combine(dir, "dashboard.html");
                 string traceZip = Path.Combine(dir, "trace", "trace.zip");
                 string logFile = Path.Combine(dir, "logs", "execution.log");
                 string healingStore = Path.Combine(dir, "healing", "FailedLocatorStore.json");
+
+                bool hasLog = File.Exists(logFile);
 
                 list.Add(new ArtifactRunInfo
                 {
@@ -129,15 +328,15 @@ namespace EaTestAutomation.Reporting
                     DisplayName = ExtractDisplayName(name),
                     FullPath = dir,
                     LastWriteUtc = Directory.GetLastWriteTimeUtc(dir),
-                    DashboardHtmlPath = File.Exists(dashboardHtml) ? dashboardHtml : null,
                     VideoFilePath = videoFile,
                     TraceFilePath = File.Exists(traceZip) ? traceZip : null,
                     ScreenshotFilePath = screenshotFile,
-                    LogFilePath = File.Exists(logFile) ? logFile : null,
+                    LogFilePath = hasLog ? logFile : null,
                     HealingStorePath = File.Exists(healingStore) ? healingStore : null,
                     HasVideo = videoFile != null,
                     HasTrace = File.Exists(traceZip),
                     HasScreenshot = screenshotFile != null,
+                    HasExecutionArtifacts = hasLog || videoFile != null || screenshotFile != null,
                     HealingMappingCount = CountHealingMappings(healingStore)
                 });
             }
@@ -197,17 +396,9 @@ namespace EaTestAutomation.Reporting
             return Directory.EnumerateFiles(directory, pattern).FirstOrDefault();
         }
 
-        /// <summary>
-        /// Builds a relative URL from the dashboard HTML folder to a file under Artifacts.
-        /// </summary>
         private static string? ToRelativeHref(string dashboardRoot, string? absolutePath)
         {
-            if (string.IsNullOrWhiteSpace(absolutePath))
-            {
-                return null;
-            }
-
-            if (!File.Exists(absolutePath))
+            if (string.IsNullOrWhiteSpace(absolutePath) || !File.Exists(absolutePath))
             {
                 return null;
             }
@@ -229,223 +420,301 @@ namespace EaTestAutomation.Reporting
                     .Select(Uri.EscapeDataString));
         }
 
-        private static string BuildMasterHtml(
-            List<TestRunRecord> history,
-            Dictionary<string, ArtifactRunInfo> artifactByFolder,
-            string dashboardRoot,
-            string artifactsRoot)
+        private static string BuildShellHtml(RealtimeDashboardPayload payload)
         {
-            int passed = history.Count(r => r.Status == "Passed");
-            int failed = history.Count(r => r.Status == "Failed");
-            int unknown = history.Count(r => r.Status != "Passed" && r.Status != "Failed");
-            int total = history.Count;
-            int healingTotal = history.Sum(r => r.HealingMappingCount);
-
-            string extentFile = Path.Combine(artifactsRoot, "ExtentReport", "ExtentDashboard.html");
-            string? extentRel = ToRelativeHref(dashboardRoot, extentFile);
-            string? artifactsIndexRel = ToRelativeHref(
-                dashboardRoot,
-                Path.Combine(artifactsRoot, "index.html"));
+            string embeddedJson = JsonSerializer.Serialize(payload, JsonOptions);
 
             var sb = new StringBuilder();
             sb.AppendLine("<!DOCTYPE html>");
             sb.AppendLine("<html lang='en'><head>");
             sb.AppendLine("<meta charset='utf-8'/>");
             sb.AppendLine("<meta name='viewport' content='width=device-width, initial-scale=1'/>");
-            sb.AppendLine("<title>EA Test Automation — Master Dashboard</title>");
+            sb.AppendLine("<title>EA Test Automation — Live Report</title>");
             sb.AppendLine("<script src='https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js'></script>");
             sb.AppendLine("<style>");
             sb.AppendLine(Css());
             sb.AppendLine("</style></head><body>");
 
             sb.AppendLine("<header class='header'>");
-            sb.AppendLine("<div><h1>EA Test Automation</h1>");
-            sb.AppendLine("<p class='subtitle'>Unified reporting dashboard — all runs, artifacts, and reports</p></div>");
-            sb.AppendLine($"<div class='stamp'>Updated {DateTime.Now:yyyy-MM-dd HH:mm:ss}</div>");
+            sb.AppendLine("<div>");
+            sb.AppendLine("<h1>EA Test Automation</h1>");
+            sb.AppendLine("<p class='subtitle'>Single live report — all framework runs and artifacts</p>");
+            sb.AppendLine("</div>");
+            sb.AppendLine("<div class='header-meta'>");
+            sb.AppendLine("<span class='live-badge'><span class='live-dot'></span> Live</span>");
+            sb.AppendLine("<div class='stamp' id='updatedStamp'>Loading…</div>");
+            sb.AppendLine("</div>");
             sb.AppendLine("</header>");
 
             sb.AppendLine("<section class='kpi-grid'>");
-            AppendKpi(sb, "Total runs", total.ToString(), "kpi-blue");
-            AppendKpi(sb, "Passed", passed.ToString(), "kpi-green");
-            AppendKpi(sb, "Failed", failed.ToString(), "kpi-red");
-            AppendKpi(sb, "Healed locators", healingTotal.ToString(), "kpi-amber");
+            sb.AppendLine("<div class='kpi kpi-blue'><div class='kpi-value' id='kpiTotal'>—</div><div class='kpi-label'>Total runs</div></div>");
+            sb.AppendLine("<div class='kpi kpi-green'><div class='kpi-value' id='kpiPassed'>—</div><div class='kpi-label'>Passed</div></div>");
+            sb.AppendLine("<div class='kpi kpi-red'><div class='kpi-value' id='kpiFailed'>—</div><div class='kpi-label'>Failed</div></div>");
+            sb.AppendLine("<div class='kpi kpi-amber'><div class='kpi-value' id='kpiHealing'>—</div><div class='kpi-label'>Healed locators</div></div>");
             sb.AppendLine("</section>");
 
-            sb.AppendLine("<section class='charts-grid'>");
+            sb.AppendLine("<section class='charts-grid charts-grid-4'>");
             sb.AppendLine("<div class='card chart-card'><h2>Test status</h2><canvas id='statusChart'></canvas></div>");
-            sb.AppendLine("<div class='card chart-card'><h2>Recent runs</h2><canvas id='recentChart'></canvas></div>");
+            sb.AppendLine("<div class='card chart-card'><h2>Run duration</h2><canvas id='runtimeChart'></canvas></div>");
+            sb.AppendLine("<div class='card chart-card'><h2>Execution timeline</h2><canvas id='timelineChart'></canvas></div>");
             sb.AppendLine("<div class='card chart-card'><h2>AI healing mappings</h2><canvas id='healingChart'></canvas></div>");
             sb.AppendLine("</section>");
 
             sb.AppendLine("<section class='card'>");
-            sb.AppendLine("<h2>Separate reports</h2>");
-            sb.AppendLine("<p class='muted'>Open dedicated reports in a new tab.</p>");
-            sb.AppendLine("<div class='report-links'>");
-
-            if (!string.IsNullOrEmpty(extentRel))
-            {
-                sb.AppendLine(ReportButton(
-                    "Extent Report",
-                    "Full Spark HTML report with steps and screenshots",
-                    extentRel,
-                    "btn-extent"));
-            }
-
-            if (!string.IsNullOrEmpty(artifactsIndexRel))
-            {
-                sb.AppendLine(ReportButton(
-                    "Artifacts index",
-                    "All per-test artifact folders",
-                    artifactsIndexRel,
-                    "btn-artifacts"));
-            }
-
-            sb.AppendLine("</div></section>");
-
-            sb.AppendLine("<section class='card'>");
+            sb.AppendLine("<div class='toolbar'>");
             sb.AppendLine("<h2>Test execution report</h2>");
-            sb.AppendLine("<p class='muted'>Status and timestamps are informational. Use <strong>Execution report</strong> links to open each file.</p>");
+            sb.AppendLine("<div class='toolbar-controls'>");
+            sb.AppendLine("<input type='search' id='searchInput' placeholder='Search test, folder, status, runtime…' autocomplete='off'/>");
+            sb.AppendLine("<select id='statusFilter'>");
+            sb.AppendLine("<option value='all'>All statuses</option>");
+            sb.AppendLine("<option value='Passed'>Passed</option>");
+            sb.AppendLine("<option value='Failed'>Failed</option>");
+            sb.AppendLine("<option value='Unknown'>Unknown</option>");
+            sb.AppendLine("</select>");
+            sb.AppendLine("</div></div>");
+            sb.AppendLine("<p class='muted' id='refreshHint'>Open via local server for live refresh, search, and delete.</p>");
+            sb.AppendLine("<p class='muted'><a id='dashboardLiveLink' href='#' target='_blank' rel='noopener'>Open live dashboard</a></p>");
             sb.AppendLine("<div class='table-wrap'><table>");
             sb.AppendLine("<thead><tr>");
-            sb.AppendLine("<th>Test</th><th>Status</th><th>Finished (UTC)</th><th>Artifact detail</th><th>Execution report</th>");
-            sb.AppendLine("</tr></thead><tbody>");
+            sb.AppendLine("<th>Test</th><th>Status</th><th>Runtime</th><th>Started (UTC)</th><th>Finished (UTC)</th><th>Artifacts</th><th>Actions</th>");
+            sb.AppendLine("</tr></thead><tbody id='runsBody'></tbody>");
+            sb.AppendLine("</table></div></section>");
 
-            var ordered = history
-                .OrderByDescending(h => h.FinishedUtc)
-                .Take(50)
-                .ToList();
-
-            foreach (TestRunRecord row in ordered)
-            {
-                string folder = row.ArtifactFolder;
-
-                if (string.IsNullOrWhiteSpace(folder))
-                {
-                    continue;
-                }
-
-                artifactByFolder.TryGetValue(folder, out ArtifactRunInfo? info);
-
-                string statusClass = row.Status switch
-                {
-                    "Passed" => "badge-pass",
-                    "Failed" => "badge-fail",
-                    _ => "badge-unknown"
-                };
-
-                string? detailHref = info != null
-                    ? ToRelativeHref(dashboardRoot, info.DashboardHtmlPath)
-                    : null;
-
-                sb.Append("<tr>");
-                sb.Append("<td>");
-                sb.Append(WebUtility.HtmlEncode(row.TestName));
-                sb.Append("</td><td><span class='badge ");
-                sb.Append(statusClass);
-                sb.Append("'>");
-                sb.Append(WebUtility.HtmlEncode(row.Status));
-                sb.Append("</span></td><td>");
-                sb.Append(row.FinishedUtc == default
-                    ? "—"
-                    : row.FinishedUtc.ToString("yyyy-MM-dd HH:mm:ss"));
-                sb.Append("</td><td class='links'>");
-                sb.Append(IconLink(detailHref, "Open detail", detailHref != null));
-                sb.Append("</td><td class='links'>");
-
-                if (info != null)
-                {
-                    sb.Append(IconLink(ToRelativeHref(dashboardRoot, info.VideoFilePath), "Video", info.VideoFilePath != null));
-                    sb.Append(IconLink(ToRelativeHref(dashboardRoot, info.TraceFilePath), "Trace", info.TraceFilePath != null));
-                    sb.Append(IconLink(ToRelativeHref(dashboardRoot, info.ScreenshotFilePath), "Screenshot", info.ScreenshotFilePath != null));
-                    sb.Append(IconLink(ToRelativeHref(dashboardRoot, info.LogFilePath), "Logs", info.LogFilePath != null));
-                    sb.Append(IconLink(ToRelativeHref(dashboardRoot, info.HealingStorePath), "Healing", info.HealingStorePath != null));
-                }
-
-                sb.AppendLine("</td></tr>");
-            }
-
-            sb.AppendLine("</tbody></table></div></section>");
-            sb.AppendLine("<footer class='footer'>EA Framework · Playwright · Extent · Self-healing</footer>");
-
+            sb.AppendLine("<footer class='footer'>EA Framework · Playwright · Self-healing · Single live report</footer>");
+            sb.AppendLine("<script type=\"application/json\" id=\"embeddedDashboardData\">");
+            sb.AppendLine(embeddedJson);
+            sb.AppendLine("</script>");
             sb.AppendLine("<script>");
-            sb.AppendLine($"const passed={passed}, failed={failed}, unknown={unknown};");
-            sb.AppendLine(BuildChartScript(ordered));
+            sb.AppendLine(ClientScript());
             sb.AppendLine("</script></body></html>");
 
             return sb.ToString();
         }
 
-        private static string BuildChartScript(List<TestRunRecord> recent)
-        {
-            var slice = recent.Take(10).ToList();
+        private static string ClientScript() => """
+            let lastPayload = null;
+            let statusChart, runtimeChart, timelineChart, healingChart;
+            const searchInput = document.getElementById('searchInput');
+            const statusFilter = document.getElementById('statusFilter');
+            const API_BASE = 'http://127.0.0.1:8765';
 
-            var labels = slice.Select(r => JsonSerializer.Serialize(
-                r.TestName.Length > 24 ? r.TestName[..24] + "…" : r.TestName));
-
-            var statusColors = slice.Select(r =>
-                r.Status == "Passed" ? "'#22c55e'"
-                : r.Status == "Failed" ? "'#ef4444'"
-                : "'#94a3b8'");
-
-            var healingLabels = slice.Select(r => JsonSerializer.Serialize(
-                r.TestName.Length > 20 ? r.TestName[..20] + "…" : r.TestName));
-
-            var healingData = slice.Select(r => r.HealingMappingCount.ToString());
-            int barCount = slice.Count;
-
-            return $@"
-new Chart(document.getElementById('statusChart'), {{
-  type: 'doughnut',
-  data: {{
-    labels: ['Passed','Failed','Unknown'],
-    datasets: [{{ data: [passed, failed, unknown],
-      backgroundColor: ['#22c55e','#ef4444','#64748b'], borderWidth: 0 }}]
-  }},
-  options: {{ plugins: {{ legend: {{ position: 'bottom', labels: {{ color: '#e2e8f0' }} }} }}, cutout: '62%' }}
-}});
-new Chart(document.getElementById('recentChart'), {{
-  type: 'bar',
-  data: {{
-    labels: [{string.Join(",", labels)}],
-    datasets: [{{ label: 'Runs', data: [{string.Join(",", Enumerable.Repeat("1", barCount))}],
-      backgroundColor: [{string.Join(",", statusColors)}] }}]
-  }},
-  options: {{ scales: {{ x: {{ ticks: {{ color: '#94a3b8', maxRotation: 45 }} }}, y: {{ ticks: {{ color: '#94a3b8' }}, beginAtZero: true }} }} }},
-    plugins: {{ legend: {{ display: false }} }}
-}});
-new Chart(document.getElementById('healingChart'), {{
-  type: 'bar',
-  data: {{
-    labels: [{string.Join(",", healingLabels)}],
-    datasets: [{{ label: 'Mappings', data: [{string.Join(",", healingData)}], backgroundColor: '#f59e0b' }}]
-  }},
-  options: {{ indexAxis: 'y', scales: {{ x: {{ ticks: {{ color: '#94a3b8' }}, beginAtZero: true }}, y: {{ ticks: {{ color: '#94a3b8' }} }} }} }},
-    plugins: {{ legend: {{ display: false }} }}
-}});";
-        }
-
-        private static void AppendKpi(StringBuilder sb, string label, string value, string cssClass)
-        {
-            sb.Append($"<div class='kpi {cssClass}'><div class='kpi-value'>{WebUtility.HtmlEncode(value)}</div>");
-            sb.Append($"<div class='kpi-label'>{WebUtility.HtmlEncode(label)}</div></div>");
-        }
-
-        private static string ReportButton(string title, string desc, string href, string css)
-        {
-            return $@"<a class='report-btn {css}' href='{WebUtility.HtmlEncode(href)}' target='_blank' rel='noopener'>
-  <span class='report-title'>{WebUtility.HtmlEncode(title)}</span>
-  <span class='report-desc'>{WebUtility.HtmlEncode(desc)}</span></a>";
-        }
-
-        private static string IconLink(string? href, string label, bool enabled)
-        {
-            if (!enabled || string.IsNullOrWhiteSpace(href))
-            {
-                return $"<span class='link-disabled'>{WebUtility.HtmlEncode(label)}</span> ";
+            function saveUiState() {
+              sessionStorage.setItem('eaSearch', searchInput.value || '');
+              sessionStorage.setItem('eaStatus', statusFilter.value || 'all');
+            }
+            function restoreUiState() {
+              const s = sessionStorage.getItem('eaSearch');
+              const f = sessionStorage.getItem('eaStatus');
+              if (s != null) searchInput.value = s;
+              if (f) statusFilter.value = f;
             }
 
-            return $"<a href=\"{href}\" target=\"_blank\" rel=\"noopener\">{WebUtility.HtmlEncode(label)}</a> ";
-        }
+            searchInput.addEventListener('input', () => { saveUiState(); renderTable(lastPayload); });
+            statusFilter.addEventListener('change', () => { saveUiState(); renderTable(lastPayload); });
+
+            document.querySelector('.kpi-green')?.addEventListener('click', () => { statusFilter.value='Passed'; saveUiState(); renderTable(lastPayload); });
+            document.querySelector('.kpi-red')?.addEventListener('click', () => { statusFilter.value='Failed'; saveUiState(); renderTable(lastPayload); });
+            document.querySelector('.kpi-blue')?.addEventListener('click', () => { statusFilter.value='all'; saveUiState(); renderTable(lastPayload); });
+
+            function readEmbeddedPayload() {
+              const el = document.getElementById('embeddedDashboardData');
+              if (!el || !el.textContent) return null;
+              try { return JSON.parse(el.textContent); } catch { return null; }
+            }
+
+            function normalizeStatus(s) { return (s || '').toLowerCase(); }
+
+            function applyPayload(data) {
+              if (!data) return;
+              lastPayload = data;
+              const live = data.dashboardUrl || API_BASE + '/';
+              const link = document.getElementById('dashboardLiveLink');
+              if (link) { link.href = live; link.textContent = live; }
+              document.getElementById('updatedStamp').textContent =
+                'Updated ' + new Date(data.updatedUtc).toLocaleString();
+              document.getElementById('kpiTotal').textContent = data.total;
+              document.getElementById('kpiPassed').textContent = data.passed;
+              document.getElementById('kpiFailed').textContent = data.failed;
+              document.getElementById('kpiHealing').textContent = data.healingTotal;
+              updateCharts(data);
+              renderTable(data);
+            }
+
+            async function refresh() {
+              try {
+                const res = await fetch(API_BASE + '/api/dashboard-data.json?_=' + Date.now(), { cache: 'no-store' });
+                if (res.ok) { applyPayload(await res.json()); return; }
+              } catch (e) { /* fall through */ }
+              applyPayload(readEmbeddedPayload());
+            }
+
+            async function deleteRun(runId) {
+              if (!runId) return;
+              if (!confirm('Delete this test run and all artifacts (video, trace, logs, screenshots, healing)?')) return;
+              try {
+                const res = await fetch(API_BASE + '/api/runs/' + encodeURIComponent(runId), { method: 'DELETE' });
+                if (!res.ok) { alert('Delete failed. Is the dashboard server running? Run a test first.'); return; }
+                await refresh();
+              } catch (e) {
+                alert('Delete failed: ' + e.message);
+              }
+            }
+
+            function truncate(s, n) { return (s||'').length > n ? s.slice(0, n) + '…' : (s||''); }
+            function fmtUtc(iso) {
+              if (!iso) return '—';
+              return new Date(iso).toISOString().slice(0, 19).replace('T', ' ');
+            }
+            function statusColor(status) {
+              if (status === 'Passed') return '#22c55e';
+              if (status === 'Failed') return '#ef4444';
+              return '#94a3b8';
+            }
+
+            function updateCharts(data) {
+              const runs = (data.runs || []).slice(0, 12);
+              const passed = data.passed || 0;
+              const failed = data.failed || 0;
+              const unknown = data.unknown || 0;
+
+              if (!statusChart) {
+                statusChart = new Chart(document.getElementById('statusChart'), {
+                  type: 'doughnut',
+                  data: { labels: ['Passed','Failed','Unknown'],
+                    datasets: [{ data: [passed, failed, unknown],
+                      backgroundColor: ['#22c55e','#ef4444','#64748b'], borderWidth: 0 }] },
+                  options: { plugins: { legend: { position: 'bottom', labels: { color: '#e2e8f0' } } }, cutout: '62%' }
+                });
+              } else {
+                statusChart.data.datasets[0].data = [passed, failed, unknown];
+                statusChart.update('none');
+              }
+
+              const rtLabels = runs.map(r => truncate(r.testName, 18));
+              const rtData = runs.map(r => Math.round((r.durationMs || 0) / 1000));
+              const rtColors = runs.map(r => statusColor(r.status));
+
+              if (!runtimeChart) {
+                runtimeChart = new Chart(document.getElementById('runtimeChart'), {
+                  type: 'bar',
+                  data: { labels: rtLabels, datasets: [{ label: 'Seconds', data: rtData, backgroundColor: rtColors }] },
+                  options: {
+                    scales: { x: { ticks: { color: '#94a3b8', maxRotation: 45 } }, y: { ticks: { color: '#94a3b8' }, beginAtZero: true, title: { display: true, text: 'seconds', color: '#94a3b8' } } },
+                    plugins: { legend: { display: false } }
+                  }
+                });
+              } else {
+                runtimeChart.data.labels = rtLabels;
+                runtimeChart.data.datasets[0].data = rtData;
+                runtimeChart.data.datasets[0].backgroundColor = rtColors;
+                runtimeChart.update('none');
+              }
+
+              const timeline = (data.timeline || []).slice(0, 15);
+              const tLabels = timeline.map(t => truncate(t.testName, 16));
+              const tDurations = timeline.map(t => Math.round((t.durationMs || 0) / 1000));
+              const tColors = timeline.map(t => statusColor(t.status));
+
+              if (!timelineChart) {
+                timelineChart = new Chart(document.getElementById('timelineChart'), {
+                  type: 'bar',
+                  data: { labels: tLabels, datasets: [{ label: 'Duration (s)', data: tDurations, backgroundColor: tColors }] },
+                  options: {
+                    indexAxis: 'y',
+                    scales: { x: { ticks: { color: '#94a3b8' }, beginAtZero: true }, y: { ticks: { color: '#94a3b8' } } },
+                    plugins: { legend: { display: false }, title: { display: true, text: 'Run timeline (duration)', color: '#94a3b8' } }
+                  }
+                });
+              } else {
+                timelineChart.data.labels = tLabels;
+                timelineChart.data.datasets[0].data = tDurations;
+                timelineChart.data.datasets[0].backgroundColor = tColors;
+                timelineChart.update('none');
+              }
+
+              const healingLabels = runs.map(r => truncate(r.testName, 20));
+              const healingData = runs.map(r => r.healingMappingCount || 0);
+
+              if (!healingChart) {
+                healingChart = new Chart(document.getElementById('healingChart'), {
+                  type: 'bar',
+                  data: { labels: healingLabels, datasets: [{ label: 'Mappings', data: healingData, backgroundColor: '#f59e0b' }] },
+                  options: { indexAxis: 'y', scales: { x: { ticks: { color: '#94a3b8' }, beginAtZero: true }, y: { ticks: { color: '#94a3b8' } } }, plugins: { legend: { display: false } } }
+                });
+              } else {
+                healingChart.data.labels = healingLabels;
+                healingChart.data.datasets[0].data = healingData;
+                healingChart.update('none');
+              }
+            }
+
+            function badgeClass(status) {
+              if (status === 'Passed') return 'badge-pass';
+              if (status === 'Failed') return 'badge-fail';
+              return 'badge-unknown';
+            }
+
+            function linkCell(href, label) {
+              if (!href) return `<span class="link-disabled">${label}</span> `;
+              return `<a href="${href}" target="_blank" rel="noopener">${label}</a> `;
+            }
+
+            function runSearchText(r) {
+              return [r.testName, r.artifactFolder, r.status, r.durationDisplay, r.runId].join(' ').toLowerCase();
+            }
+
+            function renderTable(data) {
+              const body = document.getElementById('runsBody');
+              if (!data || !data.runs) {
+                body.innerHTML = '<tr><td colspan="7" class="muted">No runs yet.</td></tr>';
+                return;
+              }
+              const q = (searchInput.value || '').trim().toLowerCase();
+              const status = statusFilter.value;
+              const filtered = data.runs.filter(r => {
+                if (status !== 'all' && normalizeStatus(r.status) !== normalizeStatus(status)) return false;
+                if (q && !runSearchText(r).includes(q)) return false;
+                return true;
+              });
+              if (!filtered.length) {
+                body.innerHTML = '<tr><td colspan="7" class="muted">No matching runs.</td></tr>';
+                return;
+              }
+              body.innerHTML = filtered.map(r => {
+                const links = r.links || {};
+                const rid = escapeHtml(r.runId || r.artifactFolder || '');
+                return `<tr>
+                  <td>${escapeHtml(r.testName)}</td>
+                  <td><span class="badge ${badgeClass(r.status)}">${escapeHtml(r.status)}</span></td>
+                  <td>${escapeHtml(r.durationDisplay || '—')}</td>
+                  <td>${fmtUtc(r.startedUtc)}</td>
+                  <td>${fmtUtc(r.finishedUtc)}</td>
+                  <td class="links">
+                    ${linkCell(links.video, 'Video')}
+                    ${linkCell(links.trace, 'Trace')}
+                    ${linkCell(links.screenshot, 'Screenshot')}
+                    ${linkCell(links.logs, 'Logs')}
+                    ${linkCell(links.healing, 'Healing')}
+                  </td>
+                  <td><button type="button" class="btn-delete" data-run-id="${rid}">Delete</button></td>
+                </tr>`;
+              }).join('');
+              body.querySelectorAll('.btn-delete').forEach(btn => {
+                btn.addEventListener('click', () => deleteRun(btn.getAttribute('data-run-id')));
+              });
+            }
+
+            function escapeHtml(s) {
+              const d = document.createElement('div');
+              d.textContent = s || '';
+              return d.innerHTML;
+            }
+
+            restoreUiState();
+            applyPayload(readEmbeddedPayload());
+            refresh();
+            setInterval(refresh, 2000);
+            """;
 
         private static string Css() => """
             :root { --bg:#0b1220; --card:#111827; --border:#1e293b; --text:#e2e8f0; --muted:#94a3b8; }
@@ -454,7 +723,11 @@ new Chart(document.getElementById('healingChart'), {{
             .header { display:flex; justify-content:space-between; align-items:flex-start; padding:28px 32px; border-bottom:1px solid var(--border); background:linear-gradient(135deg,#0f172a 0%,#1e1b4b 100%); }
             h1 { margin:0 0 6px; font-size:1.75rem; }
             .subtitle { margin:0; color:var(--muted); }
-            .stamp { color:var(--muted); font-size:.85rem; }
+            .header-meta { text-align:right; }
+            .stamp { color:var(--muted); font-size:.85rem; margin-top:8px; }
+            .live-badge { display:inline-flex; align-items:center; gap:8px; font-size:.85rem; color:#86efac; font-weight:600; }
+            .live-dot { width:8px; height:8px; border-radius:50%; background:#22c55e; animation:pulse 1.5s infinite; }
+            @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
             .kpi-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:16px; padding:24px 32px; }
             .kpi { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:20px; }
             .kpi-value { font-size:2rem; font-weight:700; }
@@ -462,17 +735,20 @@ new Chart(document.getElementById('healingChart'), {{
             .kpi-green .kpi-value { color:#22c55e; } .kpi-red .kpi-value { color:#ef4444; }
             .kpi-blue .kpi-value { color:#38bdf8; } .kpi-amber .kpi-value { color:#f59e0b; }
             .charts-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:20px; padding:0 32px 24px; }
+            .charts-grid-4 { grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); }
+            .kpi { cursor:pointer; }
+            .btn-delete { background:#7f1d1d; color:#fecaca; border:1px solid #991b1b; border-radius:6px; padding:6px 12px; cursor:pointer; font-size:.8rem; }
+            .btn-delete:hover { background:#991b1b; }
+            #dashboardLiveLink { color:#38bdf8; }
             .card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:20px 24px; margin:0 32px 24px; }
             .chart-card { margin:0; min-height:320px; }
             .chart-card h2 { margin:0 0 16px; font-size:1.1rem; }
             .muted { color:var(--muted); font-size:.9rem; }
-            .report-links { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin-top:12px; }
-            .report-btn { display:block; padding:16px; border-radius:10px; text-decoration:none; color:var(--text); border:1px solid var(--border); transition:transform .15s,border-color .15s; }
-            .report-btn:hover { transform:translateY(-2px); border-color:#38bdf8; }
-            .report-title { display:block; font-weight:600; margin-bottom:4px; }
-            .report-desc { display:block; font-size:.8rem; color:var(--muted); }
-            .btn-extent { background:linear-gradient(135deg,#1e3a5f,#0f172a); }
-            .btn-artifacts { background:linear-gradient(135deg,#312e81,#0f172a); }
+            .toolbar { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:12px; margin-bottom:8px; }
+            .toolbar h2 { margin:0; font-size:1.1rem; }
+            .toolbar-controls { display:flex; gap:10px; flex-wrap:wrap; }
+            #searchInput { padding:10px 14px; border-radius:8px; border:1px solid var(--border); background:#0f172a; color:var(--text); min-width:220px; }
+            #statusFilter { padding:10px 14px; border-radius:8px; border:1px solid var(--border); background:#0f172a; color:var(--text); }
             table { width:100%; border-collapse:collapse; font-size:.9rem; }
             th,td { border:1px solid var(--border); padding:10px 12px; text-align:left; }
             th { background:#1e293b; color:var(--muted); font-weight:600; }
@@ -493,7 +769,6 @@ new Chart(document.getElementById('healingChart'), {{
             public string DisplayName { get; set; } = "";
             public string FullPath { get; set; } = "";
             public DateTime LastWriteUtc { get; set; }
-            public string? DashboardHtmlPath { get; set; }
             public string? VideoFilePath { get; set; }
             public string? TraceFilePath { get; set; }
             public string? ScreenshotFilePath { get; set; }
@@ -502,16 +777,8 @@ new Chart(document.getElementById('healingChart'), {{
             public bool HasVideo { get; set; }
             public bool HasTrace { get; set; }
             public bool HasScreenshot { get; set; }
+            public bool HasExecutionArtifacts { get; set; }
             public int HealingMappingCount { get; set; }
-        }
-
-        private sealed class DashboardChartData
-        {
-            public int Passed { get; set; }
-            public int Failed { get; set; }
-            public int Unknown { get; set; }
-            public object? RecentRuns { get; set; }
-            public object? HealingCounts { get; set; }
         }
     }
 }

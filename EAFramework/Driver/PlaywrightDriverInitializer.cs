@@ -10,7 +10,7 @@ namespace EAFramework.Driver
         public async Task<IBrowser> GetChromeDriverAsync(TestSettings testSettings)
         {
             var options = Getparameters(testSettings.Args, testSettings.Timeout, testSettings.Headless, testSettings.SlowMo);
-            options.Channel = "Chrome";
+            options.Channel = "chrome";
             return await GetBrowserAsnc(DriverType.Chromium, options);
         }
         public async Task<IBrowser> GetEdgeDriverAsync(TestSettings testSettings)

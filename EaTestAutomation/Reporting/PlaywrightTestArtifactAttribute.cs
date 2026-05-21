@@ -5,8 +5,9 @@ using Xunit.Sdk;
 namespace EaTestAutomation.Reporting
 {
     /// <summary>
-    /// Creates <c>Artifacts/{class}_{method}_{date}_{time}/</c> before each test method.
-    /// For data-driven tests, call <see cref="Base.BaseTest.BindArtifactToTestCase"/> first in the test body.
+    /// Sets test identity before each method. Artifact folders are created lazily in
+    /// <see cref="Base.BaseTest.BindArtifactToTestCase"/> or <see cref="Base.BaseTest"/> session init —
+    /// not here — so data-driven tests do not spawn empty duplicate folders.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
     public sealed class PlaywrightTestArtifactAttribute : BeforeAfterTestAttribute
@@ -16,10 +17,7 @@ namespace EaTestAutomation.Reporting
             string identity =
                 $"{methodUnderTest.DeclaringType?.Name ?? "Test"}_{methodUnderTest.Name}";
 
-            string artifactRoot =
-                ArtifactDirectoryBuilder.CreateTestRunDirectory(identity);
-
-            TestArtifactScope.Begin(identity, artifactRoot);
+            TestArtifactScope.Begin(identity, null);
         }
 
         public override void After(MethodInfo methodUnderTest)

@@ -30,6 +30,10 @@ namespace EaTestAutomation.Base
         /// <summary>Per-test artifact root (video, trace, logs, screenshots, healing snapshot).</summary>
         protected string ArtifactRoot { get; private set; } = "";
 
+        private string _reportTestName = "";
+        private DateTime _reportStartedUtc;
+        private bool? _reportPassed;
+
         protected IPage Page => EnsurePlaywrightSession().Page.Result;
 
         public BaseTest()
@@ -48,6 +52,17 @@ namespace EaTestAutomation.Base
                 ArtifactDirectoryBuilder.CreateTestRunDirectory(identity);
 
             TestArtifactScope.Begin(identity, artifactRoot);
+            ArtifactRoot = artifactRoot;
+            _reportTestName = identity;
+            _reportStartedUtc = DateTime.UtcNow;
+            _reportPassed = null;
+        }
+
+        /// <summary>Records pass/fail for the dashboard (call from test methods).</summary>
+        protected void MarkTestPassed(bool passed)
+        {
+            _reportPassed = passed;
+            TestArtifactScope.MarkPassed(passed);
         }
 
         private PlaywrightDriver EnsurePlaywrightSession()
@@ -118,10 +133,20 @@ namespace EaTestAutomation.Base
 
         public void Dispose()
         {
+            string capturedIdentity = string.IsNullOrWhiteSpace(_reportTestName)
+                ? TestArtifactScope.Identity ?? ""
+                : _reportTestName;
+
+            bool? capturedPassed = _reportPassed ?? TestArtifactScope.Passed;
+            DateTime capturedStarted = _reportStartedUtc != default
+                ? _reportStartedUtc
+                : TestArtifactScope.StartedUtc ?? DateTime.UtcNow;
+
             try
             {
                 if (_playwrightDriver == null)
                 {
+                    FinalizeReportingWithoutBrowser(capturedIdentity, capturedPassed, capturedStarted);
                     return;
                 }
 
@@ -151,6 +176,7 @@ namespace EaTestAutomation.Base
 
                     if (failed)
                     {
+                        _executionLog?.WriteLine("Test failed.");
                         _extentTest?.Fail($"Test failed. Screenshot: {shotPath}");
                     }
                     else
@@ -161,14 +187,10 @@ namespace EaTestAutomation.Base
                 catch (Exception ex)
                 {
                     _executionLog?.WriteLine($"Screenshot skipped: {ex.Message}");
+                    TestArtifactScope.MarkFailed();
                 }
 
                 LocatorHealingArtifactExporter.CopyHealingArtifacts(ArtifactRoot);
-                HtmlArtifactDashboard.Write(
-                    ArtifactRoot,
-                    TestArtifactScope.Identity ?? GetType().Name);
-
-                RecordTestRunForDashboard();
 
                 if (TestArtifactScope.Passed != false)
                 {
@@ -177,26 +199,72 @@ namespace EaTestAutomation.Base
             }
             catch (Exception ex)
             {
+                _executionLog?.WriteLine("Test failed.");
                 _executionLog?.WriteLine($"Dispose reporting error: {ex}");
+                TestArtifactScope.MarkFailed();
                 _extentTest?.Warning($"Reporting step issue: {ex.Message}");
             }
             finally
             {
                 _playwrightDriver?.Dispose();
                 _executionLog?.Dispose();
+                RecordTestRunForDashboard(capturedIdentity, capturedPassed, capturedStarted);
                 ExtentReportManager.Flush();
-                TestRunSummaryHtml.WriteRunIndex();
                 MasterDashboardGenerator.Generate();
             }
 
             GC.SuppressFinalize(this);
         }
 
-        private void RecordTestRunForDashboard()
+        private void FinalizeReportingWithoutBrowser(
+            string capturedIdentity,
+            bool? capturedPassed,
+            DateTime capturedStarted)
         {
-            string identity = TestArtifactScope.Identity ?? GetType().Name;
+            try
+            {
+                if (string.IsNullOrWhiteSpace(ArtifactRoot))
+                {
+                    ArtifactRoot = TestArtifactScope.ArtifactRoot ?? "";
+                }
+
+                if (!string.IsNullOrWhiteSpace(ArtifactRoot))
+                {
+                    LocatorHealingArtifactExporter.CopyHealingArtifacts(ArtifactRoot);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Reporting without browser failed: {ex.Message}");
+                TestArtifactScope.MarkFailed();
+            }
+            finally
+            {
+                RecordTestRunForDashboard(capturedIdentity, capturedPassed, capturedStarted);
+                ExtentReportManager.Flush();
+                MasterDashboardGenerator.Generate();
+            }
+        }
+
+        private void RecordTestRunForDashboard(
+            string capturedIdentity,
+            bool? capturedPassed,
+            DateTime capturedStarted)
+        {
+            if (string.IsNullOrWhiteSpace(ArtifactRoot))
+            {
+                return;
+            }
+
+            string identity = string.IsNullOrWhiteSpace(capturedIdentity)
+                ? ExtractTestNameFromArtifactFolder(ArtifactRoot) ?? GetType().Name
+                : capturedIdentity;
+
             string folder = Path.GetFileName(ArtifactRoot);
-            bool failed = TestArtifactScope.Passed == false;
+            string status = ResolveTestStatus(capturedPassed);
+            DateTime finishedUtc = DateTime.UtcNow;
+            DateTime startedUtc = capturedStarted;
+            long durationMs = Math.Max(0, (long)(finishedUtc - startedUtc).TotalMilliseconds);
 
             int healingCount = 0;
             string healingPath = Path.Combine(ArtifactRoot, "healing", "FailedLocatorStore.json");
@@ -219,10 +287,13 @@ namespace EaTestAutomation.Base
 
             TestRunRegistry.Record(new TestRunRecord
             {
+                RunId = folder,
                 TestName = identity,
                 ArtifactFolder = folder,
-                Status = failed ? "Failed" : "Passed",
-                FinishedUtc = DateTime.UtcNow,
+                Status = status,
+                StartedUtc = startedUtc,
+                FinishedUtc = finishedUtc,
+                DurationMs = durationMs,
                 HasVideo = Directory.Exists(Path.Combine(ArtifactRoot, "video"))
                            && Directory.EnumerateFiles(Path.Combine(ArtifactRoot, "video")).Any(),
                 HasTrace = File.Exists(Path.Combine(ArtifactRoot, "trace", "trace.zip")),
@@ -232,6 +303,67 @@ namespace EaTestAutomation.Base
                                     "*.png").Any(),
                 HealingMappingCount = healingCount
             });
+        }
+
+        private bool DetectTestFailure()
+        {
+            string shotDir = Path.Combine(ArtifactRoot, "screenshots");
+
+            return Directory.Exists(shotDir)
+                   && Directory.EnumerateFiles(shotDir, "failure_*.png").Any();
+        }
+
+        private string ResolveTestStatus(bool? capturedPassed)
+        {
+            if (capturedPassed == false)
+            {
+                return "Failed";
+            }
+
+            if (capturedPassed == true)
+            {
+                return "Passed";
+            }
+
+            if (DetectTestFailure())
+            {
+                return "Failed";
+            }
+
+            string shotDir = Path.Combine(ArtifactRoot, "screenshots");
+
+            if (Directory.Exists(shotDir)
+                && Directory.EnumerateFiles(shotDir, "final_*.png").Any())
+            {
+                return "Passed";
+            }
+
+            return "Unknown";
+        }
+
+        private static string? ExtractTestNameFromArtifactFolder(string artifactRoot)
+        {
+            string folder = Path.GetFileName(artifactRoot);
+
+            if (string.IsNullOrWhiteSpace(folder))
+            {
+                return null;
+            }
+
+            // Strip _{guid8} _{time} _{yyyyMMdd} suffixes from artifact folder name.
+            for (int i = 0; i < 3; i++)
+            {
+                int last = folder.LastIndexOf('_');
+
+                if (last <= 0)
+                {
+                    break;
+                }
+
+                folder = folder[..last];
+            }
+
+            return folder;
         }
     }
 }

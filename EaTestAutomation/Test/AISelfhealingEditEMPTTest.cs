@@ -14,6 +14,16 @@ namespace EaTestAutomation.Test
     {
         private const string WORKSHEET_NAME = "AddEditEmployee";
 
+        /// <summary>
+        /// Set environment variable <c>EA_RUN_ALL_EXCEL_ROWS=true</c> to execute every Excel row (Theory data).
+        /// Default: only the first data row — avoids running multiple cases when you start a single test.
+        /// </summary>
+        private static bool RunAllExcelRows =>
+            string.Equals(
+                Environment.GetEnvironmentVariable("EA_RUN_ALL_EXCEL_ROWS"),
+                "true",
+                StringComparison.OrdinalIgnoreCase);
+
         public static IEnumerable<object[]> LoadEditEmployeeData()
         {
             string path = SpecialExtensions.GetExcelPath();
@@ -23,6 +33,11 @@ namespace EaTestAutomation.Test
             var worksheet = workbook.Worksheet(WORKSHEET_NAME);
 
             var rows = worksheet.RowsUsed().Skip(1).ToList();
+
+            if (!RunAllExcelRows && rows.Count > 1)
+            {
+                rows = rows.Take(1).ToList();
+            }
 
             for (int i = 0; i < rows.Count; i++)
             {
@@ -97,7 +112,7 @@ namespace EaTestAutomation.Test
             testResult = failure is null;
             errorMessage = failure?.Message ?? string.Empty;
 
-            TestArtifactScope.MarkPassed(testResult);
+            MarkTestPassed(testResult);
 
             ExcelTestTracker.WriteTestResult(
                 WORKSHEET_NAME,

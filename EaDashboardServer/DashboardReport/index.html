@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang='en'><head>
+<meta charset='utf-8'/>
+<meta name='viewport' content='width=device-width, initial-scale=1'/>
+<title>EA Test Automation — Live Report</title>
+<script src='https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js'></script>
+<style>
+:root { --bg:#0b1220; --card:#111827; --border:#1e293b; --text:#e2e8f0; --muted:#94a3b8; }
+* { box-sizing:border-box; }
+body { margin:0; font-family:'Segoe UI',system-ui,sans-serif; background:var(--bg); color:var(--text); }
+.header { display:flex; justify-content:space-between; align-items:flex-start; padding:28px 32px; border-bottom:1px solid var(--border); background:linear-gradient(135deg,#0f172a 0%,#1e1b4b 100%); }
+h1 { margin:0 0 6px; font-size:1.75rem; }
+.subtitle { margin:0; color:var(--muted); }
+.header-meta { text-align:right; }
+.stamp { color:var(--muted); font-size:.85rem; margin-top:8px; }
+.live-badge { display:inline-flex; align-items:center; gap:8px; font-size:.85rem; color:#86efac; font-weight:600; }
+.live-dot { width:8px; height:8px; border-radius:50%; background:#22c55e; animation:pulse 1.5s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+.kpi-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:16px; padding:24px 32px; }
+.kpi { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:20px; }
+.kpi-value { font-size:2rem; font-weight:700; }
+.kpi-label { color:var(--muted); margin-top:4px; font-size:.9rem; }
+.kpi-green .kpi-value { color:#22c55e; } .kpi-red .kpi-value { color:#ef4444; }
+.kpi-blue .kpi-value { color:#38bdf8; } .kpi-amber .kpi-value { color:#f59e0b; }
+.charts-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:20px; padding:0 32px 24px; }
+.charts-grid-4 { grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); }
+.kpi { cursor:pointer; }
+.btn-delete { background:#7f1d1d; color:#fecaca; border:1px solid #991b1b; border-radius:6px; padding:6px 12px; cursor:pointer; font-size:.8rem; }
+.btn-delete:hover { background:#991b1b; }
+#dashboardLiveLink { color:#38bdf8; }
+.card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:20px 24px; margin:0 32px 24px; }
+.chart-card { margin:0; min-height:320px; }
+.chart-card h2 { margin:0 0 16px; font-size:1.1rem; }
+.muted { color:var(--muted); font-size:.9rem; }
+.toolbar { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:12px; margin-bottom:8px; }
+.toolbar h2 { margin:0; font-size:1.1rem; }
+.toolbar-controls { display:flex; gap:10px; flex-wrap:wrap; }
+#searchInput { padding:10px 14px; border-radius:8px; border:1px solid var(--border); background:#0f172a; color:var(--text); min-width:220px; }
+#statusFilter { padding:10px 14px; border-radius:8px; border:1px solid var(--border); background:#0f172a; color:var(--text); }
+table { width:100%; border-collapse:collapse; font-size:.9rem; }
+th,td { border:1px solid var(--border); padding:10px 12px; text-align:left; }
+th { background:#1e293b; color:var(--muted); font-weight:600; }
+.table-wrap { overflow-x:auto; margin-top:12px; }
+.badge { padding:4px 10px; border-radius:999px; font-size:.75rem; font-weight:600; }
+.badge-pass { background:#14532d; color:#86efac; }
+.badge-fail { background:#7f1d1d; color:#fca5a5; }
+.badge-unknown { background:#334155; color:#cbd5e1; }
+.links a { color:#38bdf8; margin-right:8px; text-decoration:none; font-size:.85rem; }
+.links a:hover { text-decoration:underline; }
+.link-disabled { color:#475569; margin-right:8px; font-size:.85rem; }
+.footer { text-align:center; padding:24px; color:var(--muted); font-size:.8rem; border-top:1px solid var(--border); }
+</style></head><body>
+<header class='header'>
+<div>
+<h1>EA Test Automation</h1>
+<p class='subtitle'>Single live report — all framework runs and artifacts</p>
+</div>
+<div class='header-meta'>
+<span class='live-badge'><span class='live-dot'></span> Live</span>
+<div class='stamp' id='updatedStamp'>Loading…</div>
+</div>
+</header>
+<section class='kpi-grid'>
+<div class='kpi kpi-blue'><div class='kpi-value' id='kpiTotal'>—</div><div class='kpi-label'>Total runs</div></div>
+<div class='kpi kpi-green'><div class='kpi-value' id='kpiPassed'>—</div><div class='kpi-label'>Passed</div></div>
+<div class='kpi kpi-red'><div class='kpi-value' id='kpiFailed'>—</div><div class='kpi-label'>Failed</div></div>
+<div class='kpi kpi-amber'><div class='kpi-value' id='kpiHealing'>—</div><div class='kpi-label'>Healed locators</div></div>
+</section>
+<section class='charts-grid charts-grid-4'>
+<div class='card chart-card'><h2>Test status</h2><canvas id='statusChart'></canvas></div>
+<div class='card chart-card'><h2>Run duration</h2><canvas id='runtimeChart'></canvas></div>
+<div class='card chart-card'><h2>Execution timeline</h2><canvas id='timelineChart'></canvas></div>
+<div class='card chart-card'><h2>AI healing mappings</h2><canvas id='healingChart'></canvas></div>
+</section>
+<section class='card'>
+<div class='toolbar'>
+<h2>Test execution report</h2>
+<div class='toolbar-controls'>
+<input type='search' id='searchInput' placeholder='Search test, folder, status, runtime…' autocomplete='off'/>
+<select id='statusFilter'>
+<option value='all'>All statuses</option>
+<option value='Passed'>Passed</option>
+<option value='Failed'>Failed</option>
+<option value='Unknown'>Unknown</option>
+</select>
+</div></div>
+<p class='muted' id='refreshHint'>Open via local server for live refresh, search, and delete.</p>
+<p class='muted'><a id='dashboardLiveLink' href='#' target='_blank' rel='noopener'>Open live dashboard</a></p>
+<div class='table-wrap'><table>
+<thead><tr>
+<th>Test</th><th>Status</th><th>Runtime</th><th>Started (UTC)</th><th>Finished (UTC)</th><th>Artifacts</th><th>Actions</th>
+</tr></thead><tbody id='runsBody'></tbody>
+</table></div></section>
+<footer class='footer'>EA Framework · Playwright · Self-healing · Single live report</footer>
+<script type="application/json" id="embeddedDashboardData">
+{
+  "updatedUtc": "2026-05-21T07:51:11.4698822Z",
+  "dashboardUrl": "http://127.0.0.1:8765/",
+  "total": 1,
+  "passed": 1,
+  "failed": 0,
+  "unknown": 0,
+  "healingTotal": 2,
+  "runs": [
+    {
+      "runId": "AISelfHeal_EditEmployee_Raj_20260521_131028098_d4bfd7ce",
+      "testName": "AISelfHeal_EditEmployee_Raj",
+      "status": "Passed",
+      "startedUtc": "2026-05-21T07:40:28.1020598Z",
+      "finishedUtc": "2026-05-21T07:41:13.5874282Z",
+      "durationMs": 45485,
+      "durationDisplay": "45.485s",
+      "artifactFolder": "AISelfHeal_EditEmployee_Raj_20260521_131028098_d4bfd7ce",
+      "healingMappingCount": 2,
+      "links": {
+        "video": "../Artifacts/AISelfHeal_EditEmployee_Raj_20260521_131028098_d4bfd7ce/video/page%40229e23dcadaf2d673669a84470067847.webm",
+        "trace": "../Artifacts/AISelfHeal_EditEmployee_Raj_20260521_131028098_d4bfd7ce/trace/trace.zip",
+        "screenshot": "../Artifacts/AISelfHeal_EditEmployee_Raj_20260521_131028098_d4bfd7ce/screenshots/final_20260521_131108.png",
+        "logs": "../Artifacts/AISelfHeal_EditEmployee_Raj_20260521_131028098_d4bfd7ce/logs/execution.log",
+        "healing": "../Artifacts/AISelfHeal_EditEmployee_Raj_20260521_131028098_d4bfd7ce/healing/FailedLocatorStore.json"
+      }
+    }
+  ],
+  "timeline": [
+    {
+      "testName": "AISelfHeal_EditEmployee_Raj",
+      "status": "Passed",
+      "startedUtc": "2026-05-21T07:40:28.1020598Z",
+      "finishedUtc": "2026-05-21T07:41:13.5874282Z",
+      "durationMs": 45485
+    }
+  ]
+}
+</script>
+<script>
+let lastPayload = null;
+let statusChart, runtimeChart, timelineChart, healingChart;
+const searchInput = document.getElementById('searchInput');
+const statusFilter = document.getElementById('statusFilter');
+const API_BASE = 'http://127.0.0.1:8765';
+
+function saveUiState() {
+  sessionStorage.setItem('eaSearch', searchInput.value || '');
+  sessionStorage.setItem('eaStatus', statusFilter.value || 'all');
+}
+function restoreUiState() {
+  const s = sessionStorage.getItem('eaSearch');
+  const f = sessionStorage.getItem('eaStatus');
+  if (s != null) searchInput.value = s;
+  if (f) statusFilter.value = f;
+}
+
+searchInput.addEventListener('input', () => { saveUiState(); renderTable(lastPayload); });
+statusFilter.addEventListener('change', () => { saveUiState(); renderTable(lastPayload); });
+
+document.querySelector('.kpi-green')?.addEventListener('click', () => { statusFilter.value='Passed'; saveUiState(); renderTable(lastPayload); });
+document.querySelector('.kpi-red')?.addEventListener('click', () => { statusFilter.value='Failed'; saveUiState(); renderTable(lastPayload); });
+document.querySelector('.kpi-blue')?.addEventListener('click', () => { statusFilter.value='all'; saveUiState(); renderTable(lastPayload); });
+
+function readEmbeddedPayload() {
+  const el = document.getElementById('embeddedDashboardData');
+  if (!el || !el.textContent) return null;
+  try { return JSON.parse(el.textContent); } catch { return null; }
+}
+
+function normalizeStatus(s) { return (s || '').toLowerCase(); }
+
+function applyPayload(data) {
+  if (!data) return;
+  lastPayload = data;
+  const live = data.dashboardUrl || API_BASE + '/';
+  const link = document.getElementById('dashboardLiveLink');
+  if (link) { link.href = live; link.textContent = live; }
+  document.getElementById('updatedStamp').textContent =
+    'Updated ' + new Date(data.updatedUtc).toLocaleString();
+  document.getElementById('kpiTotal').textContent = data.total;
+  document.getElementById('kpiPassed').textContent = data.passed;
+  document.getElementById('kpiFailed').textContent = data.failed;
+  document.getElementById('kpiHealing').textContent = data.healingTotal;
+  updateCharts(data);
+  renderTable(data);
+}
+
+async function refresh() {
+  try {
+    const res = await fetch(API_BASE + '/api/dashboard-data.json?_=' + Date.now(), { cache: 'no-store' });
+    if (res.ok) { applyPayload(await res.json()); return; }
+  } catch (e) { /* fall through */ }
+  applyPayload(readEmbeddedPayload());
+}
+
+async function deleteRun(runId) {
+  if (!runId) return;
+  if (!confirm('Delete this test run and all artifacts (video, trace, logs, screenshots, healing)?')) return;
+  try {
+    const res = await fetch(API_BASE + '/api/runs/' + encodeURIComponent(runId), { method: 'DELETE' });
+    if (!res.ok) { alert('Delete failed. Is the dashboard server running? Run a test first.'); return; }
+    await refresh();
+  } catch (e) {
+    alert('Delete failed: ' + e.message);
+  }
+}
+
+function truncate(s, n) { return (s||'').length > n ? s.slice(0, n) + '…' : (s||''); }
+function fmtUtc(iso) {
+  if (!iso) return '—';
+  return new Date(iso).toISOString().slice(0, 19).replace('T', ' ');
+}
+function statusColor(status) {
+  if (status === 'Passed') return '#22c55e';
+  if (status === 'Failed') return '#ef4444';
+  return '#94a3b8';
+}
+
+function updateCharts(data) {
+  const runs = (data.runs || []).slice(0, 12);
+  const passed = data.passed || 0;
+  const failed = data.failed || 0;
+  const unknown = data.unknown || 0;
+
+  if (!statusChart) {
+    statusChart = new Chart(document.getElementById('statusChart'), {
+      type: 'doughnut',
+      data: { labels: ['Passed','Failed','Unknown'],
+        datasets: [{ data: [passed, failed, unknown],
+          backgroundColor: ['#22c55e','#ef4444','#64748b'], borderWidth: 0 }] },
+      options: { plugins: { legend: { position: 'bottom', labels: { color: '#e2e8f0' } } }, cutout: '62%' }
+    });
+  } else {
+    statusChart.data.datasets[0].data = [passed, failed, unknown];
+    statusChart.update('none');
+  }
+
+  const rtLabels = runs.map(r => truncate(r.testName, 18));
+  const rtData = runs.map(r => Math.round((r.durationMs || 0) / 1000));
+  const rtColors = runs.map(r => statusColor(r.status));
+
+  if (!runtimeChart) {
+    runtimeChart = new Chart(document.getElementById('runtimeChart'), {
+      type: 'bar',
+      data: { labels: rtLabels, datasets: [{ label: 'Seconds', data: rtData, backgroundColor: rtColors }] },
+      options: {
+        scales: { x: { ticks: { color: '#94a3b8', maxRotation: 45 } }, y: { ticks: { color: '#94a3b8' }, beginAtZero: true, title: { display: true, text: 'seconds', color: '#94a3b8' } } },
+        plugins: { legend: { display: false } }
+      }
+    });
+  } else {
+    runtimeChart.data.labels = rtLabels;
+    runtimeChart.data.datasets[0].data = rtData;
+    runtimeChart.data.datasets[0].backgroundColor = rtColors;
+    runtimeChart.update('none');
+  }
+
+  const timeline = (data.timeline || []).slice(0, 15);
+  const tLabels = timeline.map(t => truncate(t.testName, 16));
+  const tDurations = timeline.map(t => Math.round((t.durationMs || 0) / 1000));
+  const tColors = timeline.map(t => statusColor(t.status));
+
+  if (!timelineChart) {
+    timelineChart = new Chart(document.getElementById('timelineChart'), {
+      type: 'bar',
+      data: { labels: tLabels, datasets: [{ label: 'Duration (s)', data: tDurations, backgroundColor: tColors }] },
+      options: {
+        indexAxis: 'y',
+        scales: { x: { ticks: { color: '#94a3b8' }, beginAtZero: true }, y: { ticks: { color: '#94a3b8' } } },
+        plugins: { legend: { display: false }, title: { display: true, text: 'Run timeline (duration)', color: '#94a3b8' } }
+      }
+    });
+  } else {
+    timelineChart.data.labels = tLabels;
+    timelineChart.data.datasets[0].data = tDurations;
+    timelineChart.data.datasets[0].backgroundColor = tColors;
+    timelineChart.update('none');
+  }
+
+  const healingLabels = runs.map(r => truncate(r.testName, 20));
+  const healingData = runs.map(r => r.healingMappingCount || 0);
+
+  if (!healingChart) {
+    healingChart = new Chart(document.getElementById('healingChart'), {
+      type: 'bar',
+      data: { labels: healingLabels, datasets: [{ label: 'Mappings', data: healingData, backgroundColor: '#f59e0b' }] },
+      options: { indexAxis: 'y', scales: { x: { ticks: { color: '#94a3b8' }, beginAtZero: true }, y: { ticks: { color: '#94a3b8' } } }, plugins: { legend: { display: false } } }
+    });
+  } else {
+    healingChart.data.labels = healingLabels;
+    healingChart.data.datasets[0].data = healingData;
+    healingChart.update('none');
+  }
+}
+
+function badgeClass(status) {
+  if (status === 'Passed') return 'badge-pass';
+  if (status === 'Failed') return 'badge-fail';
+  return 'badge-unknown';
+}
+
+function linkCell(href, label) {
+  if (!href) return `<span class="link-disabled">${label}</span> `;
+  return `<a href="${href}" target="_blank" rel="noopener">${label}</a> `;
+}
+
+function runSearchText(r) {
+  return [r.testName, r.artifactFolder, r.status, r.durationDisplay, r.runId].join(' ').toLowerCase();
+}
+
+function renderTable(data) {
+  const body = document.getElementById('runsBody');
+  if (!data || !data.runs) {
+    body.innerHTML = '<tr><td colspan="7" class="muted">No runs yet.</td></tr>';
+    return;
+  }
+  const q = (searchInput.value || '').trim().toLowerCase();
+  const status = statusFilter.value;
+  const filtered = data.runs.filter(r => {
+    if (status !== 'all' && normalizeStatus(r.status) !== normalizeStatus(status)) return false;
+    if (q && !runSearchText(r).includes(q)) return false;
+    return true;
+  });
+  if (!filtered.length) {
+    body.innerHTML = '<tr><td colspan="7" class="muted">No matching runs.</td></tr>';
+    return;
+  }
+  body.innerHTML = filtered.map(r => {
+    const links = r.links || {};
+    const rid = escapeHtml(r.runId || r.artifactFolder || '');
+    return `<tr>
+      <td>${escapeHtml(r.testName)}</td>
+      <td><span class="badge ${badgeClass(r.status)}">${escapeHtml(r.status)}</span></td>
+      <td>${escapeHtml(r.durationDisplay || '—')}</td>
+      <td>${fmtUtc(r.startedUtc)}</td>
+      <td>${fmtUtc(r.finishedUtc)}</td>
+      <td class="links">
+        ${linkCell(links.video, 'Video')}
+        ${linkCell(links.trace, 'Trace')}
+        ${linkCell(links.screenshot, 'Screenshot')}
+        ${linkCell(links.logs, 'Logs')}
+        ${linkCell(links.healing, 'Healing')}
+      </td>
+      <td><button type="button" class="btn-delete" data-run-id="${rid}">Delete</button></td>
+    </tr>`;
+  }).join('');
+  body.querySelectorAll('.btn-delete').forEach(btn => {
+    btn.addEventListener('click', () => deleteRun(btn.getAttribute('data-run-id')));
+  });
+}
+
+function escapeHtml(s) {
+  const d = document.createElement('div');
+  d.textContent = s || '';
+  return d.innerHTML;
+}
+
+restoreUiState();
+applyPayload(readEmbeddedPayload());
+refresh();
+setInterval(refresh, 2000);
+</script></body></html>

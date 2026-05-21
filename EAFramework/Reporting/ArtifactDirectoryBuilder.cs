@@ -11,9 +11,16 @@ namespace EAFramework.Reporting
 
         public static string EnsureArtifactRoot()
         {
-            string root = Path.Combine(Directory.GetCurrentDirectory(), "Artifacts");
-            Directory.CreateDirectory(root);
-            return root;
+            string runtime = Path.Combine(AppContext.BaseDirectory, "Artifacts");
+
+            if (Directory.Exists(runtime))
+            {
+                return Path.GetFullPath(runtime);
+            }
+
+            string cwd = Path.Combine(Directory.GetCurrentDirectory(), "Artifacts");
+            Directory.CreateDirectory(cwd);
+            return Path.GetFullPath(cwd);
         }
 
         /// <summary>

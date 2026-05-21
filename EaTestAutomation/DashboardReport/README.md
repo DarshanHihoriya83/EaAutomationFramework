@@ -1,41 +1,55 @@
 # DashboardReport
 
-This folder holds the **unified master dashboard** for EA Test Automation.
+Single live report for EA Test Automation (charts, search, delete, runtime).
 
-## Generated files (after test run)
+## Start the server from CMD (recommended)
+
+From the repo root:
+
+```cmd
+cd C:\EaAutomationFramework\EaDashboardServer
+dotnet run
+```
+
+Or double-click:
+
+```
+C:\EaAutomationFramework\start-dashboard.cmd
+```
+
+Then open in the browser:
+
+```
+http://127.0.0.1:8765/
+```
+
+Press **Ctrl+C** in the CMD window to stop the server.
+
+## Start automatically (after a test)
+
+Any test run rebuilds the dashboard and starts the server on port **8765**:
+
+```cmd
+cd C:\EaAutomationFramework\EaTestAutomation
+dotnet test --filter "FullyQualifiedName~AISelfhealingEditEMPTTest"
+```
+
+## Generated files
 
 | File | Description |
 |------|-------------|
-| `index.html` | Master dashboard with charts (pass/fail, healing) and links to all reports |
-| `dashboard-data.json` | Chart data snapshot |
-| `test-results.json` | Historical test run records |
+| `index.html` | Live dashboard UI |
+| `dashboard-data.json` | Data for charts and table |
+| `test-results.json` | Run history |
 
-## Open the dashboard
+Paths (after build):
 
-After running tests, open:
+- `EaTestAutomation\bin\Debug\net8.0\DashboardReport\`
+- `EaTestAutomation\DashboardReport\` (project folder)
 
-```
-EaTestAutomation/bin/Debug/net8.0/DashboardReport/index.html
-```
+## Features (requires http://127.0.0.1:8765/)
 
-Or from the project folder (when generated during development):
-
-```
-EaTestAutomation/DashboardReport/index.html
-```
-
-## Linked reports
-
-From the master dashboard you can open:
-
-- **Extent Report** — aggregate HTML under `Artifacts/ExtentReport/`
-- **Per-test detail** — each run’s `Artifacts/{test}_{date}/dashboard.html`
-- **Video** — Playwright recording (`.webm`)
-- **Trace** — `trace.zip` (use `playwright show-trace`)
-- **Screenshots** — final / failure captures
-- **Logs** — `execution.log`
-- **Healing** — `FailedLocatorStore.json` and `AutoHealReport.txt`
-
-## Regenerate manually
-
-The dashboard is rebuilt automatically in `BaseTest.Dispose()`. To refresh after copying artifacts, run any test or call `MasterDashboardGenerator.Generate()` from code.
+- Pass / Failed / Unknown charts
+- Run duration and timeline charts
+- Search and status filter
+- Delete run (removes artifacts: video, trace, logs, screenshots, healing)

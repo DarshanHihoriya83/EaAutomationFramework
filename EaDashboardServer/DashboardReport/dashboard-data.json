@@ -1,0 +1,138 @@
+{
+  "updatedUtc": "2026-05-21T10:13:21.6537019Z",
+  "dashboardUrl": "http://127.0.0.1:8765/",
+  "total": 5,
+  "passed": 5,
+  "failed": 0,
+  "unknown": 0,
+  "healingTotal": 10,
+  "runs": [
+    {
+      "runId": "AISelfHeal_EditEmployee_Raj_20260521_152058902_bef43069",
+      "testName": "AISelfHeal_EditEmployee_Raj",
+      "status": "Passed",
+      "startedUtc": "2026-05-21T09:50:58.9060381Z",
+      "finishedUtc": "2026-05-21T09:51:32.0377676Z",
+      "durationMs": 33131,
+      "durationDisplay": "33.131s",
+      "artifactFolder": "AISelfHeal_EditEmployee_Raj_20260521_152058902_bef43069",
+      "healingMappingCount": 2,
+      "links": {
+        "video": "../Artifacts/AISelfHeal_EditEmployee_Raj_20260521_152058902_bef43069/video/page%40fab1f45f7e447a55752ab49c7940a6ed.webm",
+        "trace": "../Artifacts/AISelfHeal_EditEmployee_Raj_20260521_152058902_bef43069/trace/trace.zip",
+        "screenshot": "../Artifacts/AISelfHeal_EditEmployee_Raj_20260521_152058902_bef43069/screenshots/final_20260521_152126.png",
+        "logs": "../Artifacts/AISelfHeal_EditEmployee_Raj_20260521_152058902_bef43069/logs/execution.log",
+        "healing": "../Artifacts/AISelfHeal_EditEmployee_Raj_20260521_152058902_bef43069/healing/FailedLocatorStore.json"
+      }
+    },
+    {
+      "runId": "AISelfHeal_EditEmployee_Raj_20260521_144530193_1c80557f",
+      "testName": "AISelfHeal_EditEmployee_Raj",
+      "status": "Passed",
+      "startedUtc": "2026-05-21T09:15:30.2006883Z",
+      "finishedUtc": "2026-05-21T09:16:08.0423388Z",
+      "durationMs": 37841,
+      "durationDisplay": "37.841s",
+      "artifactFolder": "AISelfHeal_EditEmployee_Raj_20260521_144530193_1c80557f",
+      "healingMappingCount": 2,
+      "links": {
+        "video": "../Artifacts/AISelfHeal_EditEmployee_Raj_20260521_144530193_1c80557f/video/page%403c9601783d2d7c0a78d09f7f2c82c222.webm",
+        "trace": "../Artifacts/AISelfHeal_EditEmployee_Raj_20260521_144530193_1c80557f/trace/trace.zip",
+        "screenshot": "../Artifacts/AISelfHeal_EditEmployee_Raj_20260521_144530193_1c80557f/screenshots/final_20260521_144603.png",
+        "logs": "../Artifacts/AISelfHeal_EditEmployee_Raj_20260521_144530193_1c80557f/logs/execution.log",
+        "healing": "../Artifacts/AISelfHeal_EditEmployee_Raj_20260521_144530193_1c80557f/healing/FailedLocatorStore.json"
+      }
+    },
+    {
+      "runId": "AISelfHeal_EditEmployee_Raj_20260521_134958480_581ff667",
+      "testName": "AISelfHeal_EditEmployee_Raj",
+      "status": "Passed",
+      "startedUtc": "2026-05-21T08:19:58.4862656Z",
+      "finishedUtc": "2026-05-21T08:20:30.0206292Z",
+      "durationMs": 31534,
+      "durationDisplay": "31.534s",
+      "artifactFolder": "AISelfHeal_EditEmployee_Raj_20260521_134958480_581ff667",
+      "healingMappingCount": 2,
+      "links": {
+        "video": "../Artifacts/AISelfHeal_EditEmployee_Raj_20260521_134958480_581ff667/video/page%40475171fdc4c530a1c57e741fffcb5811.webm",
+        "trace": "../Artifacts/AISelfHeal_EditEmployee_Raj_20260521_134958480_581ff667/trace/trace.zip",
+        "screenshot": "../Artifacts/AISelfHeal_EditEmployee_Raj_20260521_134958480_581ff667/screenshots/final_20260521_135024.png",
+        "logs": "../Artifacts/AISelfHeal_EditEmployee_Raj_20260521_134958480_581ff667/logs/execution.log",
+        "healing": "../Artifacts/AISelfHeal_EditEmployee_Raj_20260521_134958480_581ff667/healing/FailedLocatorStore.json"
+      }
+    },
+    {
+      "runId": "AISelfHeal_EditEmployee_Raj_20260521_134822882_5accaf5d",
+      "testName": "AISelfHeal_EditEmployee_Raj",
+      "status": "Passed",
+      "startedUtc": "2026-05-21T08:18:22.887808Z",
+      "finishedUtc": "2026-05-21T08:19:05.3170432Z",
+      "durationMs": 42429,
+      "durationDisplay": "42.429s",
+      "artifactFolder": "AISelfHeal_EditEmployee_Raj_20260521_134822882_5accaf5d",
+      "healingMappingCount": 2,
+      "links": {
+        "video": "../Artifacts/AISelfHeal_EditEmployee_Raj_20260521_134822882_5accaf5d/video/page%404cccede513ee4835063a34d5ec1f17ad.webm",
+        "trace": "../Artifacts/AISelfHeal_EditEmployee_Raj_20260521_134822882_5accaf5d/trace/trace.zip",
+        "screenshot": "../Artifacts/AISelfHeal_EditEmployee_Raj_20260521_134822882_5accaf5d/screenshots/final_20260521_134856.png",
+        "logs": "../Artifacts/AISelfHeal_EditEmployee_Raj_20260521_134822882_5accaf5d/logs/execution.log",
+        "healing": "../Artifacts/AISelfHeal_EditEmployee_Raj_20260521_134822882_5accaf5d/healing/FailedLocatorStore.json"
+      }
+    },
+    {
+      "runId": "AISelfHeal_EditEmployee_Raj_20260521_131028098_d4bfd7ce",
+      "testName": "AISelfHeal_EditEmployee_Raj",
+      "status": "Passed",
+      "startedUtc": "2026-05-21T07:40:28.1020598Z",
+      "finishedUtc": "2026-05-21T07:41:13.5874282Z",
+      "durationMs": 45485,
+      "durationDisplay": "45.485s",
+      "artifactFolder": "AISelfHeal_EditEmployee_Raj_20260521_131028098_d4bfd7ce",
+      "healingMappingCount": 2,
+      "links": {
+        "video": "../Artifacts/AISelfHeal_EditEmployee_Raj_20260521_131028098_d4bfd7ce/video/page%40229e23dcadaf2d673669a84470067847.webm",
+        "trace": "../Artifacts/AISelfHeal_EditEmployee_Raj_20260521_131028098_d4bfd7ce/trace/trace.zip",
+        "screenshot": "../Artifacts/AISelfHeal_EditEmployee_Raj_20260521_131028098_d4bfd7ce/screenshots/final_20260521_131108.png",
+        "logs": "../Artifacts/AISelfHeal_EditEmployee_Raj_20260521_131028098_d4bfd7ce/logs/execution.log",
+        "healing": "../Artifacts/AISelfHeal_EditEmployee_Raj_20260521_131028098_d4bfd7ce/healing/FailedLocatorStore.json"
+      }
+    }
+  ],
+  "timeline": [
+    {
+      "testName": "AISelfHeal_EditEmployee_Raj",
+      "status": "Passed",
+      "startedUtc": "2026-05-21T09:50:58.9060381Z",
+      "finishedUtc": "2026-05-21T09:51:32.0377676Z",
+      "durationMs": 33131
+    },
+    {
+      "testName": "AISelfHeal_EditEmployee_Raj",
+      "status": "Passed",
+      "startedUtc": "2026-05-21T09:15:30.2006883Z",
+      "finishedUtc": "2026-05-21T09:16:08.0423388Z",
+      "durationMs": 37841
+    },
+    {
+      "testName": "AISelfHeal_EditEmployee_Raj",
+      "status": "Passed",
+      "startedUtc": "2026-05-21T08:19:58.4862656Z",
+      "finishedUtc": "2026-05-21T08:20:30.0206292Z",
+      "durationMs": 31534
+    },
+    {
+      "testName": "AISelfHeal_EditEmployee_Raj",
+      "status": "Passed",
+      "startedUtc": "2026-05-21T08:18:22.887808Z",
+      "finishedUtc": "2026-05-21T08:19:05.3170432Z",
+      "durationMs": 42429
+    },
+    {
+      "testName": "AISelfHeal_EditEmployee_Raj",
+      "status": "Passed",
+      "startedUtc": "2026-05-21T07:40:28.1020598Z",
+      "finishedUtc": "2026-05-21T07:41:13.5874282Z",
+      "durationMs": 45485
+    }
+  ]
+}
