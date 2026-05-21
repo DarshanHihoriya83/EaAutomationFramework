@@ -1,5 +1,4 @@
-﻿using ClosedXML.Excel;
-using EaTestAutomation.Base;
+﻿using EaTestAutomation.Base;
 using EaTestAutomation.Pages;
 using EaTestAutomation.Utilities;
 using Xunit;
@@ -8,42 +7,26 @@ namespace EaTestAutomation.Test
 {
     public class EditEMPTest : BaseTest
     {
-        private const string WORKSHEET_NAME = "AddEditEmployee";
+        private const string WorksheetName = "AddEditEmployee";
 
         public static IEnumerable<object[]> LoadEditEmployeeData()
         {
-            string path = SpecialExtensions.GetExcelPath();
-
-            using var workbook = new XLWorkbook(path);
-
-            var worksheet = workbook.Worksheet(WORKSHEET_NAME);
-
-            var rows = worksheet.RowsUsed().Skip(1).ToList();
-
-            for (int i = 0; i < rows.Count; i++)
+            foreach (ExcelDataLoader.EmployeeExcelRow row in ExcelDataLoader.LoadEmployeeRows(WorksheetName))
             {
-                var row = rows[i];
+                string testName = $"EditEmployee_{row.Name}_R{row.RowIndex}";
 
-                string name = row.Cell(1).GetString();
-                string age = row.Cell(2).GetString();
-                string salary = row.Cell(3).GetString();
-                string durationWorked = row.Cell(4).GetString();
-                string grade = row.Cell(5).GetString();
-                string email = row.Cell(6).GetString();
-
-                string testName = $"EditEmployee_{name}";
-
-                ExcelTestTracker.TrackTestRow(testName, i + 1);
+                ExcelTestTracker.TrackTestRow(testName, row.RowIndex, row.Reference);
 
                 yield return new object[]
                 {
-                    name,
-                    age,
-                    salary,
-                    durationWorked,
-                    grade,
-                    email,
-                    testName
+                    row.Name,
+                    row.Age,
+                    row.Salary,
+                    row.DurationWorked,
+                    row.Grade,
+                    row.Email,
+                    testName,
+                    row.Reference
                 };
             }
         }
@@ -57,10 +40,11 @@ namespace EaTestAutomation.Test
             string durationWorked,
             string grade,
             string email,
-            string testName)
+            string testName,
+            string reference)
         {
             bool testResult = false;
-            string errorMessage = "";
+            string message = "";
 
             var _EditEMPPage = new EditEMPPage(Page);
 
@@ -85,19 +69,20 @@ namespace EaTestAutomation.Test
             }
             catch (Exception ex)
             {
-                errorMessage = ex.Message;
-
+                message = ex.Message;
                 testResult = false;
-
                 throw;
             }
             finally
             {
+                MarkTestPassed(testResult);
+
                 ExcelTestTracker.WriteTestResult(
-                    WORKSHEET_NAME,
+                    WorksheetName,
                     testName,
                     testResult,
-                    errorMessage);
+                    message,
+                    reference);
             }
         }
     }

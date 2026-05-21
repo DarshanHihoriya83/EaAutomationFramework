@@ -1,5 +1,3 @@
-using ClosedXML.Excel;
-using EAFramework.Reporting;
 using EaTestAutomation.Base;
 using EaTestAutomation.Pages;
 using EaTestAutomation.Utilities;
@@ -8,61 +6,30 @@ using Xunit;
 namespace EaTestAutomation.Test
 {
     /// <summary>
-    /// Edit Employee test using AI self-healing page object.
+    /// Edit Employee test using AI self-healing — runs every row from Excel <c>AddEditEmployee</c>.
     /// </summary>
     public class AISelfhealingEditEMPTTest : BaseTest
     {
-        private const string WORKSHEET_NAME = "AddEditEmployee";
-
-        /// <summary>
-        /// Set environment variable <c>EA_RUN_ALL_EXCEL_ROWS=true</c> to execute every Excel row (Theory data).
-        /// Default: only the first data row — avoids running multiple cases when you start a single test.
-        /// </summary>
-        private static bool RunAllExcelRows =>
-            string.Equals(
-                Environment.GetEnvironmentVariable("EA_RUN_ALL_EXCEL_ROWS"),
-                "true",
-                StringComparison.OrdinalIgnoreCase);
+        private const string WorksheetName = "AddEditEmployee";
 
         public static IEnumerable<object[]> LoadEditEmployeeData()
         {
-            string path = SpecialExtensions.GetExcelPath();
-
-            using var workbook = new XLWorkbook(path);
-
-            var worksheet = workbook.Worksheet(WORKSHEET_NAME);
-
-            var rows = worksheet.RowsUsed().Skip(1).ToList();
-
-            if (!RunAllExcelRows && rows.Count > 1)
+            foreach (ExcelDataLoader.EmployeeExcelRow row in ExcelDataLoader.LoadEmployeeRows(WorksheetName))
             {
-                rows = rows.Take(1).ToList();
-            }
+                string testName = $"AISelfHeal_EditEmployee_{row.Name}_R{row.RowIndex}";
 
-            for (int i = 0; i < rows.Count; i++)
-            {
-                var row = rows[i];
-
-                string name = row.Cell(1).GetString();
-                string age = row.Cell(2).GetString();
-                string salary = row.Cell(3).GetString();
-                string durationWorked = row.Cell(4).GetString();
-                string grade = row.Cell(5).GetString();
-                string email = row.Cell(6).GetString();
-
-                string testName = $"AISelfHeal_EditEmployee_{name}";
-
-                ExcelTestTracker.TrackTestRow(testName, i + 1);
+                ExcelTestTracker.TrackTestRow(testName, row.RowIndex, row.Reference);
 
                 yield return new object[]
                 {
-                    name,
-                    age,
-                    salary,
-                    durationWorked,
-                    grade,
-                    email,
-                    testName
+                    row.Name,
+                    row.Age,
+                    row.Salary,
+                    row.DurationWorked,
+                    row.Grade,
+                    row.Email,
+                    testName,
+                    row.Reference
                 };
             }
         }
@@ -76,23 +43,23 @@ namespace EaTestAutomation.Test
             string durationWorked,
             string grade,
             string email,
-            string testName)
+            string testName,
+            string reference)
         {
-            bool testResult;
-            string errorMessage;
+            bool testResult = false;
+            string message = "";
 
             BindArtifactToTestCase(testName);
 
             var editPage = new EditEMPTSelfHealingPage(Page);
 
-            Exception? failure = await Record.ExceptionAsync(async () =>
+            try
             {
                 await editPage.NavigateAsync(
                     $"{_testSettings.Applicationurl.TrimEnd('/')}/Employee");
 
                 await editPage.ClickEmployees();
 
-                // Intentionally use a broken selector once so the engine persists a mapping in FailedLocatorStore.json.
                 await editPage.FillAsync(
                     "form.search-card input[name='searchTerm']xxx",
                     name);
@@ -107,23 +74,35 @@ namespace EaTestAutomation.Test
                 await editPage.EditGradeSelectDropdownOptionAsync(grade);
                 await editPage.EditEmailInput(email);
                 await editPage.ClickonSaveChangesButton();
-            });
 
-            testResult = failure is null;
-            errorMessage = failure?.Message ?? string.Empty;
-
-            MarkTestPassed(testResult);
-
-            ExcelTestTracker.WriteTestResult(
-                WORKSHEET_NAME,
-                testName,
-                testResult,
-                errorMessage);
-
-            if (failure is not null)
-            {
-                throw failure;
+                testResult = true;
             }
+            catch (Exception ex)
+            {
+                message = FormatError(ex);
+                throw;
+            }
+            finally
+            {
+                MarkTestPassed(testResult);
+
+                ExcelTestTracker.WriteTestResult(
+                    WorksheetName,
+                    testName,
+                    testResult,
+                    message,
+                    reference);
+            }
+        }
+
+        private static string FormatError(Exception ex)
+        {
+            if (ex.InnerException == null)
+            {
+                return ex.Message;
+            }
+
+            return $"{ex.Message} | {ex.InnerException.Message}";
         }
     }
 }
