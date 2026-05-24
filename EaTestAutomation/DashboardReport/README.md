@@ -53,3 +53,12 @@ Paths (after build):
 - Run duration and timeline charts
 - Search and status filter
 - Delete run (removes artifacts: video, trace, logs, screenshots, healing)
+- **Download whole execution report** (header button) — ZIP with all runs, summaries, artifacts, and dashboard snapshot
+- **Download single run report** (per-row **Download** button) — ZIP with that run’s summary HTML/JSON and artifact folder
+
+### Download API
+
+| Endpoint | Description |
+|----------|-------------|
+| `GET /api/download/execution-report` | Whole execution report ZIP |
+| `GET /api/download/run/{runId}` | Single run report ZIP |

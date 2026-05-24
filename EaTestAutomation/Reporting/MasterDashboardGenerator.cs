@@ -477,6 +477,7 @@ namespace EaTestAutomation.Reporting
             sb.AppendLine("<div class='header-meta'>");
             sb.AppendLine("<span class='live-badge'><span class='live-dot'></span> Live</span>");
             sb.AppendLine("<div class='stamp' id='updatedStamp'>Loading…</div>");
+            sb.AppendLine("<button type='button' class='btn-download-header' id='btnDownloadWhole'>Download whole execution report</button>");
             sb.AppendLine("</div>");
             sb.AppendLine("</header>");
 
@@ -509,7 +510,7 @@ namespace EaTestAutomation.Reporting
             sb.AppendLine("<option value='Unknown'>Unknown</option>");
             sb.AppendLine("</select>");
             sb.AppendLine("</div></div>");
-            sb.AppendLine("<p class='muted' id='refreshHint'>Open via local server for live refresh, search, and delete.</p>");
+            sb.AppendLine("<p class='muted' id='refreshHint'>Open via local server for live refresh, search, delete, and report downloads.</p>");
             sb.AppendLine("<p class='muted'><a id='dashboardLiveLink' href='#' target='_blank' rel='noopener'>Open live dashboard</a></p>");
             sb.AppendLine("<div class='table-wrap'><table>");
             sb.AppendLine("<thead><tr>");
@@ -598,6 +599,17 @@ namespace EaTestAutomation.Reporting
                 alert('Delete failed: ' + e.message);
               }
             }
+
+            function downloadRunReport(runId) {
+              if (!runId) return;
+              window.location.href = API_BASE + '/api/download/run/' + encodeURIComponent(runId);
+            }
+
+            function downloadWholeReport() {
+              window.location.href = API_BASE + '/api/download/execution-report';
+            }
+
+            document.getElementById('btnDownloadWhole')?.addEventListener('click', downloadWholeReport);
 
             function truncate(s, n) { return (s||'').length > n ? s.slice(0, n) + '…' : (s||''); }
             function fmtUtc(iso) {
@@ -767,9 +779,15 @@ namespace EaTestAutomation.Reporting
                     ${linkCell(links.logs, 'Logs')}
                     ${linkCell(links.healing, 'Healing')}
                   </td>
-                  <td><button type="button" class="btn-delete" data-run-id="${rid}">Delete</button></td>
+                  <td class="actions">
+                    <button type="button" class="btn-download" data-run-id="${rid}">Download</button>
+                    <button type="button" class="btn-delete" data-run-id="${rid}">Delete</button>
+                  </td>
                 </tr>`;
               }).join('');
+              body.querySelectorAll('.btn-download').forEach(btn => {
+                btn.addEventListener('click', () => downloadRunReport(btn.getAttribute('data-run-id')));
+              });
               body.querySelectorAll('.btn-delete').forEach(btn => {
                 btn.addEventListener('click', () => deleteRun(btn.getAttribute('data-run-id')));
               });
@@ -813,6 +831,11 @@ namespace EaTestAutomation.Reporting
             .kpi { cursor:pointer; }
             .btn-delete { background:#7f1d1d; color:#fecaca; border:1px solid #991b1b; border-radius:6px; padding:6px 12px; cursor:pointer; font-size:.8rem; }
             .btn-delete:hover { background:#991b1b; }
+            .btn-download { background:#1e3a5f; color:#bae6fd; border:1px solid #2563eb; border-radius:6px; padding:6px 12px; cursor:pointer; font-size:.8rem; margin-right:6px; }
+            .btn-download:hover { background:#1d4ed8; }
+            .btn-download-header { margin-top:12px; background:#1e3a5f; color:#e0f2fe; border:1px solid #38bdf8; border-radius:8px; padding:10px 16px; cursor:pointer; font-size:.85rem; font-weight:600; }
+            .btn-download-header:hover { background:#1d4ed8; }
+            .actions { white-space:nowrap; }
             #dashboardLiveLink { color:#38bdf8; }
             .card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:20px 24px; margin:0 32px 24px; }
             .chart-card { margin:0; min-height:320px; }

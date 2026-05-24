@@ -183,6 +183,21 @@ namespace EaTestAutomation.Reporting
                     return;
                 }
 
+                if (req.HttpMethod == "GET"
+                    && path.Equals("/api/download/execution-report", StringComparison.OrdinalIgnoreCase))
+                {
+                    ServeWholeExecutionDownload(res);
+                    return;
+                }
+
+                if (req.HttpMethod == "GET"
+                    && path.StartsWith("/api/download/run/", StringComparison.OrdinalIgnoreCase))
+                {
+                    string runId = path["/api/download/run/".Length..];
+                    ServeSingleRunDownload(runId, res);
+                    return;
+                }
+
                 if (path.StartsWith("/artifacts/", StringComparison.OrdinalIgnoreCase))
                 {
                     string relative = path["/artifacts/".Length..];
@@ -265,6 +280,58 @@ namespace EaTestAutomation.Reporting
                 _ => "application/octet-stream"
             };
 
+        private static void ServeSingleRunDownload(string runId, HttpListenerResponse res)
+        {
+            string safeId = DashboardReportDownloadService.SanitizeRunId(runId);
+
+            if (string.IsNullOrEmpty(safeId))
+            {
+                res.StatusCode = 400;
+                res.Close();
+                return;
+            }
+
+            using var buffer = new MemoryStream();
+
+            if (!DashboardReportDownloadService.TryCreateSingleRunZip(safeId, buffer))
+            {
+                res.StatusCode = 404;
+                res.Close();
+                return;
+            }
+
+            RealtimeDashboardPayload payload = MasterDashboardGenerator.RefreshLivePayload();
+            DashboardRunRow? run = payload.Runs.FirstOrDefault(r =>
+                string.Equals(r.RunId, safeId, StringComparison.OrdinalIgnoreCase)
+                || string.Equals(r.ArtifactFolder, safeId, StringComparison.OrdinalIgnoreCase));
+
+            string fileName = run == null
+                ? $"EA-SingleRun-{safeId}.zip"
+                : DashboardReportDownloadService.BuildSingleRunZipFileName(run);
+
+            WriteZipAttachment(res, buffer.ToArray(), fileName);
+        }
+
+        private static void ServeWholeExecutionDownload(HttpListenerResponse res)
+        {
+            using var buffer = new MemoryStream();
+            DashboardReportDownloadService.CreateWholeExecutionZip(buffer);
+            string fileName = DashboardReportDownloadService.BuildWholeExecutionZipFileName();
+            WriteZipAttachment(res, buffer.ToArray(), fileName);
+        }
+
+        private static void WriteZipAttachment(HttpListenerResponse res, byte[] content, string fileName)
+        {
+            res.StatusCode = 200;
+            res.ContentType = "application/zip";
+            res.AddHeader(
+                "Content-Disposition",
+                $"attachment; filename=\"{fileName}\"");
+            res.ContentLength64 = content.Length;
+            res.OutputStream.Write(content, 0, content.Length);
+            res.Close();
+        }
+
         private static void WriteJson(HttpListenerResponse res, int code, string json)
         {
             byte[] bytes = Encoding.UTF8.GetBytes(json);
@@ -278,6 +345,7 @@ namespace EaTestAutomation.Reporting
         {
             res.Headers["Access-Control-Allow-Origin"] = "*";
             res.Headers["Access-Control-Allow-Methods"] = "GET, DELETE, OPTIONS";
+            res.Headers["Access-Control-Expose-Headers"] = "Content-Disposition";
             res.Headers["Access-Control-Allow-Headers"] = "Content-Type";
         }
     }

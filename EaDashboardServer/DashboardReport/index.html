@@ -30,6 +30,11 @@ h1 { margin:0 0 6px; font-size:1.75rem; }
 .kpi { cursor:pointer; }
 .btn-delete { background:#7f1d1d; color:#fecaca; border:1px solid #991b1b; border-radius:6px; padding:6px 12px; cursor:pointer; font-size:.8rem; }
 .btn-delete:hover { background:#991b1b; }
+.btn-download { background:#1e3a5f; color:#bae6fd; border:1px solid #2563eb; border-radius:6px; padding:6px 12px; cursor:pointer; font-size:.8rem; margin-right:6px; }
+.btn-download:hover { background:#1d4ed8; }
+.btn-download-header { margin-top:12px; background:#1e3a5f; color:#e0f2fe; border:1px solid #38bdf8; border-radius:8px; padding:10px 16px; cursor:pointer; font-size:.85rem; font-weight:600; }
+.btn-download-header:hover { background:#1d4ed8; }
+.actions { white-space:nowrap; }
 #dashboardLiveLink { color:#38bdf8; }
 .card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:20px 24px; margin:0 32px 24px; }
 .chart-card { margin:0; min-height:320px; }
@@ -61,6 +66,7 @@ th { background:#1e293b; color:var(--muted); font-weight:600; }
 <div class='header-meta'>
 <span class='live-badge'><span class='live-dot'></span> Live</span>
 <div class='stamp' id='updatedStamp'>Loading…</div>
+<button type='button' class='btn-download-header' id='btnDownloadWhole'>Download whole execution report</button>
 </div>
 </header>
 <section class='kpi-grid kpi-grid-6'>
@@ -90,7 +96,7 @@ th { background:#1e293b; color:var(--muted); font-weight:600; }
 <option value='Unknown'>Unknown</option>
 </select>
 </div></div>
-<p class='muted' id='refreshHint'>Open via local server for live refresh, search, and delete.</p>
+<p class='muted' id='refreshHint'>Open via local server for live refresh, search, delete, and report downloads.</p>
 <p class='muted'><a id='dashboardLiveLink' href='#' target='_blank' rel='noopener'>Open live dashboard</a></p>
 <div class='table-wrap'><table>
 <thead><tr>
@@ -100,17 +106,107 @@ th { background:#1e293b; color:var(--muted); font-weight:600; }
 <footer class='footer'>EA Framework · Playwright · Self-healing · Single live report</footer>
 <script type="application/json" id="embeddedDashboardData">
 {
-  "updatedUtc": "2026-05-21T17:25:38.6318856Z",
+  "updatedUtc": "2026-05-24T12:39:59.164619Z",
   "dashboardUrl": "http://127.0.0.1:8765/",
-  "total": 5,
-  "passed": 5,
+  "total": 10,
+  "passed": 10,
   "failed": 0,
   "unknown": 0,
-  "healingTotal": 10,
+  "healingTotal": 20,
   "passRatePercent": 100,
   "failRatePercent": 0,
   "unknownRatePercent": 0,
   "runs": [
+    {
+      "runId": "AISelfHeal_EditEmployee_Raj_R2_20260521_232919817_87869c3b",
+      "testName": "AISelfHeal_EditEmployee_Raj_R2",
+      "status": "Passed",
+      "startedUtc": "2026-05-21T17:59:19.962809Z",
+      "finishedUtc": "2026-05-21T17:59:58.8041977Z",
+      "durationMs": 38841,
+      "durationDisplay": "38.841s",
+      "artifactFolder": "AISelfHeal_EditEmployee_Raj_R2_20260521_232919817_87869c3b",
+      "healingMappingCount": 2,
+      "links": {
+        "video": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_R2_20260521_232919817_87869c3b/video/page%40ce153498f320343de23604fa0c4bc4ee.webm",
+        "trace": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_R2_20260521_232919817_87869c3b/trace/trace.zip",
+        "screenshot": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_R2_20260521_232919817_87869c3b/screenshots/final_20260521_232953.png",
+        "logs": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_R2_20260521_232919817_87869c3b/logs/execution.log",
+        "healing": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_R2_20260521_232919817_87869c3b/healing/FailedLocatorStore.json"
+      }
+    },
+    {
+      "runId": "AISelfHeal_EditEmployee_Raj_R2_20260521_232518120_829c1a03",
+      "testName": "AISelfHeal_EditEmployee_Raj_R2",
+      "status": "Passed",
+      "startedUtc": "2026-05-21T17:55:18.1220821Z",
+      "finishedUtc": "2026-05-21T17:55:59.9718904Z",
+      "durationMs": 41849,
+      "durationDisplay": "41.849s",
+      "artifactFolder": "AISelfHeal_EditEmployee_Raj_R2_20260521_232518120_829c1a03",
+      "healingMappingCount": 2,
+      "links": {
+        "video": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_R2_20260521_232518120_829c1a03/video/page%4006e13877e2072db09d5ef9a25a0437cf.webm",
+        "trace": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_R2_20260521_232518120_829c1a03/trace/trace.zip",
+        "screenshot": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_R2_20260521_232518120_829c1a03/screenshots/final_20260521_232554.png",
+        "logs": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_R2_20260521_232518120_829c1a03/logs/execution.log",
+        "healing": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_R2_20260521_232518120_829c1a03/healing/FailedLocatorStore.json"
+      }
+    },
+    {
+      "runId": "AISelfHeal_EditEmployee_Raj_R3_20260521_232443689_ea925fc9",
+      "testName": "AISelfHeal_EditEmployee_Raj_R3",
+      "status": "Passed",
+      "startedUtc": "2026-05-21T17:54:43.7002227Z",
+      "finishedUtc": "2026-05-21T17:55:18.0879936Z",
+      "durationMs": 34387,
+      "durationDisplay": "34.387s",
+      "artifactFolder": "AISelfHeal_EditEmployee_Raj_R3_20260521_232443689_ea925fc9",
+      "healingMappingCount": 2,
+      "links": {
+        "video": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_R3_20260521_232443689_ea925fc9/video/page%4080b662fceeeef40adb71c33ea89ca2cc.webm",
+        "trace": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_R3_20260521_232443689_ea925fc9/trace/trace.zip",
+        "screenshot": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_R3_20260521_232443689_ea925fc9/screenshots/final_20260521_232513.png",
+        "logs": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_R3_20260521_232443689_ea925fc9/logs/execution.log",
+        "healing": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_R3_20260521_232443689_ea925fc9/healing/FailedLocatorStore.json"
+      }
+    },
+    {
+      "runId": "AISelfHeal_EditEmployee_Raj_R1_20260521_232407762_3a48478c",
+      "testName": "AISelfHeal_EditEmployee_Raj_R1",
+      "status": "Passed",
+      "startedUtc": "2026-05-21T17:54:07.7706679Z",
+      "finishedUtc": "2026-05-21T17:54:43.658673Z",
+      "durationMs": 35888,
+      "durationDisplay": "35.888s",
+      "artifactFolder": "AISelfHeal_EditEmployee_Raj_R1_20260521_232407762_3a48478c",
+      "healingMappingCount": 2,
+      "links": {
+        "video": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_R1_20260521_232407762_3a48478c/video/page%405767a5f366ae2dd392dffdd448855a1d.webm",
+        "trace": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_R1_20260521_232407762_3a48478c/trace/trace.zip",
+        "screenshot": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_R1_20260521_232407762_3a48478c/screenshots/final_20260521_232439.png",
+        "logs": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_R1_20260521_232407762_3a48478c/logs/execution.log",
+        "healing": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_R1_20260521_232407762_3a48478c/healing/FailedLocatorStore.json"
+      }
+    },
+    {
+      "runId": "AISelfHeal_EditEmployee_Raj_R4_20260521_232320968_ea95d6e8",
+      "testName": "AISelfHeal_EditEmployee_Raj_R4",
+      "status": "Passed",
+      "startedUtc": "2026-05-21T17:53:20.9729917Z",
+      "finishedUtc": "2026-05-21T17:53:58.1180197Z",
+      "durationMs": 37145,
+      "durationDisplay": "37.145s",
+      "artifactFolder": "AISelfHeal_EditEmployee_Raj_R4_20260521_232320968_ea95d6e8",
+      "healingMappingCount": 2,
+      "links": {
+        "video": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_R4_20260521_232320968_ea95d6e8/video/page%402bb8c4618048140dfa15e9746fb98ca7.webm",
+        "trace": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_R4_20260521_232320968_ea95d6e8/trace/trace.zip",
+        "screenshot": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_R4_20260521_232320968_ea95d6e8/screenshots/final_20260521_232353.png",
+        "logs": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_R4_20260521_232320968_ea95d6e8/logs/execution.log",
+        "healing": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_R4_20260521_232320968_ea95d6e8/healing/FailedLocatorStore.json"
+      }
+    },
     {
       "runId": "AddNewEmpTest_AddNewEmployeeTest_20260521_224940781_2985dc62",
       "testName": "AddNewEmpTest_AddNewEmployeeTest",
@@ -203,6 +299,41 @@ th { background:#1e293b; color:var(--muted); font-weight:600; }
     }
   ],
   "timeline": [
+    {
+      "testName": "AISelfHeal_EditEmployee_Raj_R2",
+      "status": "Passed",
+      "startedUtc": "2026-05-21T17:59:19.962809Z",
+      "finishedUtc": "2026-05-21T17:59:58.8041977Z",
+      "durationMs": 38841
+    },
+    {
+      "testName": "AISelfHeal_EditEmployee_Raj_R2",
+      "status": "Passed",
+      "startedUtc": "2026-05-21T17:55:18.1220821Z",
+      "finishedUtc": "2026-05-21T17:55:59.9718904Z",
+      "durationMs": 41849
+    },
+    {
+      "testName": "AISelfHeal_EditEmployee_Raj_R3",
+      "status": "Passed",
+      "startedUtc": "2026-05-21T17:54:43.7002227Z",
+      "finishedUtc": "2026-05-21T17:55:18.0879936Z",
+      "durationMs": 34387
+    },
+    {
+      "testName": "AISelfHeal_EditEmployee_Raj_R1",
+      "status": "Passed",
+      "startedUtc": "2026-05-21T17:54:07.7706679Z",
+      "finishedUtc": "2026-05-21T17:54:43.658673Z",
+      "durationMs": 35888
+    },
+    {
+      "testName": "AISelfHeal_EditEmployee_Raj_R4",
+      "status": "Passed",
+      "startedUtc": "2026-05-21T17:53:20.9729917Z",
+      "finishedUtc": "2026-05-21T17:53:58.1180197Z",
+      "durationMs": 37145
+    },
     {
       "testName": "AddNewEmpTest_AddNewEmployeeTest",
       "status": "Passed",
@@ -311,6 +442,17 @@ async function deleteRun(runId) {
     alert('Delete failed: ' + e.message);
   }
 }
+
+function downloadRunReport(runId) {
+  if (!runId) return;
+  window.location.href = API_BASE + '/api/download/run/' + encodeURIComponent(runId);
+}
+
+function downloadWholeReport() {
+  window.location.href = API_BASE + '/api/download/execution-report';
+}
+
+document.getElementById('btnDownloadWhole')?.addEventListener('click', downloadWholeReport);
 
 function truncate(s, n) { return (s||'').length > n ? s.slice(0, n) + '…' : (s||''); }
 function fmtUtc(iso) {
@@ -480,9 +622,15 @@ function renderTable(data) {
         ${linkCell(links.logs, 'Logs')}
         ${linkCell(links.healing, 'Healing')}
       </td>
-      <td><button type="button" class="btn-delete" data-run-id="${rid}">Delete</button></td>
+      <td class="actions">
+        <button type="button" class="btn-download" data-run-id="${rid}">Download</button>
+        <button type="button" class="btn-delete" data-run-id="${rid}">Delete</button>
+      </td>
     </tr>`;
   }).join('');
+  body.querySelectorAll('.btn-download').forEach(btn => {
+    btn.addEventListener('click', () => downloadRunReport(btn.getAttribute('data-run-id')));
+  });
   body.querySelectorAll('.btn-delete').forEach(btn => {
     btn.addEventListener('click', () => deleteRun(btn.getAttribute('data-run-id')));
   });

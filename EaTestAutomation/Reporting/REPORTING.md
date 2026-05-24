@@ -13,6 +13,11 @@ Open after any test run for:
 
 Regenerated automatically in `BaseTest.Dispose()`.
 
+**Downloads** (dashboard server on port 8765):
+
+- **Whole execution report** — header button or `GET /api/download/execution-report` (ZIP: all runs, artifacts, `execution-report.json`, `execution-summary.html`)
+- **Single run report** — row **Download** or `GET /api/download/run/{runId}` (ZIP: run summary + that run’s artifacts)
+
 ## Per-test artifacts
 
 Each `BaseTest` run creates a folder under `Artifacts/` named:
