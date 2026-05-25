@@ -1,4 +1,4 @@
-﻿using Microsoft.Playwright;
+using Microsoft.Playwright;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 

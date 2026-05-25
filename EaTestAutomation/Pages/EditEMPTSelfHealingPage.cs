@@ -32,7 +32,7 @@ namespace EaTestAutomation.Pages
             ".form-card-body .form-row-2 input[name='Age']";
 
         private const string SalarySelector =
-            ".form-card-body .form-row-2 #Salary2";
+            ".form-card-body .form-row-2 #Salary";
 
         private const string DurationSelector =
             ".form-card-body .form-row-2 input[name='DurationWorked']";

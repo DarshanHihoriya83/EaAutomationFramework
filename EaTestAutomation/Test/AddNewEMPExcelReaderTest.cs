@@ -1,4 +1,4 @@
-﻿using EaTestAutomation.Base;
+using EaTestAutomation.Base;
 using EaTestAutomation.Pages;
 using EaTestAutomation.Utilities;
 using Xunit;

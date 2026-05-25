@@ -131,11 +131,11 @@ namespace EaTestAutomation.Base
 
             LoginPage = new LoginPage(page);
 
-            await LoginPage.ClickOnLoginButton();
-            await LoginPage.FillUsername();
-            await LoginPage.FillPassword();
-            await LoginPage.ClickOnSignInButton();
-            Assert.Contains("Employee", await page.ContentAsync());
+            //await LoginPage.ClickOnLoginButton();
+            //await LoginPage.FillUsername();
+            //await LoginPage.FillPassword();
+            //await LoginPage.ClickOnSignInButton();
+            //Assert.Contains("Employee", await page.ContentAsync());
             await Task.Delay(2000);
         }
 

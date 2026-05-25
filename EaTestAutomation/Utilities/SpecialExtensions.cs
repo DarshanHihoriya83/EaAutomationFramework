@@ -1,4 +1,4 @@
-﻿namespace EaTestAutomation.Utilities
+namespace EaTestAutomation.Utilities
 {
     /// <summary>Typo alias for <see cref="SpecialExtensions"/> (legacy tests).</summary>
     public static class SpecialExtenstions

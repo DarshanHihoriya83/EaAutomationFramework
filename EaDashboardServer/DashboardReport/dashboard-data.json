@@ -1,15 +1,339 @@
 {
-  "updatedUtc": "2026-05-25T09:18:50.0492966Z",
+  "updatedUtc": "2026-05-25T11:50:50.2740117Z",
   "dashboardUrl": "http://127.0.0.1:8765/",
-  "total": 100,
-  "passed": 73,
-  "failed": 27,
+  "total": 118,
+  "passed": 76,
+  "failed": 42,
   "unknown": 0,
-  "healingTotal": 31,
-  "passRatePercent": 73,
-  "failRatePercent": 27,
+  "healingTotal": 49,
+  "passRatePercent": 64.4,
+  "failRatePercent": 35.6,
   "unknownRatePercent": 0,
   "runs": [
+    {
+      "runId": "RegisterEmpTest_RegistrationEmployeeTest_20260525_171807456_5c8fb446",
+      "testName": "RegisterEmpTest_RegistrationEmployeeTest",
+      "status": "Failed",
+      "startedUtc": "2026-05-25T11:48:46.2939023Z",
+      "finishedUtc": "2026-05-25T11:48:51.7941505Z",
+      "durationMs": 5500,
+      "durationDisplay": "5.500s",
+      "artifactFolder": "RegisterEmpTest_RegistrationEmployeeTest_20260525_171807456_5c8fb446",
+      "healingMappingCount": 1,
+      "links": {
+        "video": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_171807456_5c8fb446/video/page%40fb806fc66baaf2a8482b91419323d2f7.webm",
+        "trace": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_171807456_5c8fb446/trace/trace.zip",
+        "screenshot": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_171807456_5c8fb446/screenshots/failure_20260525_171846.png",
+        "logs": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_171807456_5c8fb446/logs/execution.log",
+        "healing": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_171807456_5c8fb446/healing/FailedLocatorStore.json"
+      }
+    },
+    {
+      "runId": "RegisterEmpTest_RegistrationEmployeeTest_20260525_165734206_c2b23daf",
+      "testName": "RegisterEmpTest_RegistrationEmployeeTest",
+      "status": "Passed",
+      "startedUtc": "2026-05-25T11:27:55.8813706Z",
+      "finishedUtc": "2026-05-25T11:28:02.8336884Z",
+      "durationMs": 6952,
+      "durationDisplay": "6.952s",
+      "artifactFolder": "RegisterEmpTest_RegistrationEmployeeTest_20260525_165734206_c2b23daf",
+      "healingMappingCount": 1,
+      "links": {
+        "video": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_165734206_c2b23daf/video/page%40cfd5f7d483e35e4586aebb1ad4ad4c2c.webm",
+        "trace": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_165734206_c2b23daf/trace/trace.zip",
+        "screenshot": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_165734206_c2b23daf/screenshots/final_20260525_165755.png",
+        "logs": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_165734206_c2b23daf/logs/execution.log",
+        "healing": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_165734206_c2b23daf/healing/FailedLocatorStore.json"
+      }
+    },
+    {
+      "runId": "RegisterEmpTest_RegistrationEmployeeTest_20260525_165402955_bcd5538e",
+      "testName": "RegisterEmpTest_RegistrationEmployeeTest",
+      "status": "Failed",
+      "startedUtc": "2026-05-25T11:24:53.1488916Z",
+      "finishedUtc": "2026-05-25T11:24:59.6213777Z",
+      "durationMs": 6472,
+      "durationDisplay": "6.472s",
+      "artifactFolder": "RegisterEmpTest_RegistrationEmployeeTest_20260525_165402955_bcd5538e",
+      "healingMappingCount": 1,
+      "links": {
+        "video": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_165402955_bcd5538e/video/page%40dd3f2f880df33cf8a2113cb297778456.webm",
+        "trace": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_165402955_bcd5538e/trace/trace.zip",
+        "screenshot": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_165402955_bcd5538e/screenshots/failure_20260525_165453.png",
+        "logs": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_165402955_bcd5538e/logs/execution.log",
+        "healing": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_165402955_bcd5538e/healing/FailedLocatorStore.json"
+      }
+    },
+    {
+      "runId": "RegisterEmpTest_RegistrationEmployeeTest_20260525_163547561_e860e878",
+      "testName": "RegisterEmpTest_RegistrationEmployeeTest",
+      "status": "Passed",
+      "startedUtc": "2026-05-25T11:06:05.8994114Z",
+      "finishedUtc": "2026-05-25T11:06:12.1043628Z",
+      "durationMs": 6204,
+      "durationDisplay": "6.204s",
+      "artifactFolder": "RegisterEmpTest_RegistrationEmployeeTest_20260525_163547561_e860e878",
+      "healingMappingCount": 1,
+      "links": {
+        "video": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_163547561_e860e878/video/page%403b1c19a490ddfc26974526b38c1f9ca2.webm",
+        "trace": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_163547561_e860e878/trace/trace.zip",
+        "screenshot": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_163547561_e860e878/screenshots/final_20260525_163605.png",
+        "logs": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_163547561_e860e878/logs/execution.log",
+        "healing": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_163547561_e860e878/healing/FailedLocatorStore.json"
+      }
+    },
+    {
+      "runId": "RegisterEmpTest_RegistrationEmployeeTest_20260525_162713913_fbad58fb",
+      "testName": "RegisterEmpTest_RegistrationEmployeeTest",
+      "status": "Failed",
+      "startedUtc": "2026-05-25T10:57:59.1070714Z",
+      "finishedUtc": "2026-05-25T10:58:01.6233742Z",
+      "durationMs": 2516,
+      "durationDisplay": "2.516s",
+      "artifactFolder": "RegisterEmpTest_RegistrationEmployeeTest_20260525_162713913_fbad58fb",
+      "healingMappingCount": 1,
+      "links": {
+        "video": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_162713913_fbad58fb/video/page%4036e873a362b2c3d5518bd4a49b9e002d.webm",
+        "trace": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_162713913_fbad58fb/trace/trace.zip",
+        "screenshot": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_162713913_fbad58fb/screenshots/failure_20260525_162759.png",
+        "logs": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_162713913_fbad58fb/logs/execution.log",
+        "healing": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_162713913_fbad58fb/healing/FailedLocatorStore.json"
+      }
+    },
+    {
+      "runId": "RegisterEmpTest_RegistrationEmployeeTest_20260525_162005237_d2579c35",
+      "testName": "RegisterEmpTest_RegistrationEmployeeTest",
+      "status": "Passed",
+      "startedUtc": "2026-05-25T10:50:16.8648813Z",
+      "finishedUtc": "2026-05-25T10:50:21.6007101Z",
+      "durationMs": 4735,
+      "durationDisplay": "4.735s",
+      "artifactFolder": "RegisterEmpTest_RegistrationEmployeeTest_20260525_162005237_d2579c35",
+      "healingMappingCount": 1,
+      "links": {
+        "video": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_162005237_d2579c35/video/page%40ef5fea6c526b0a8f2e79670e39682b4c.webm",
+        "trace": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_162005237_d2579c35/trace/trace.zip",
+        "screenshot": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_162005237_d2579c35/screenshots/final_20260525_162016.png",
+        "logs": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_162005237_d2579c35/logs/execution.log",
+        "healing": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_162005237_d2579c35/healing/FailedLocatorStore.json"
+      }
+    },
+    {
+      "runId": "RegisterEmpTest_RegistrationEmployeeTest_20260525_161822225_e953bb27",
+      "testName": "RegisterEmpTest_RegistrationEmployeeTest",
+      "status": "Failed",
+      "startedUtc": "2026-05-25T10:49:03.1291699Z",
+      "finishedUtc": "2026-05-25T10:49:08.8148489Z",
+      "durationMs": 5685,
+      "durationDisplay": "5.685s",
+      "artifactFolder": "RegisterEmpTest_RegistrationEmployeeTest_20260525_161822225_e953bb27",
+      "healingMappingCount": 1,
+      "links": {
+        "video": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_161822225_e953bb27/video/page%40509ffa75618a85d69bcf4a57353d3f7f.webm",
+        "trace": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_161822225_e953bb27/trace/trace.zip",
+        "screenshot": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_161822225_e953bb27/screenshots/failure_20260525_161903.png",
+        "logs": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_161822225_e953bb27/logs/execution.log",
+        "healing": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_161822225_e953bb27/healing/FailedLocatorStore.json"
+      }
+    },
+    {
+      "runId": "RegisterEmpTest_RegistrationEmployeeTest_20260525_161614185_30dd8f8b",
+      "testName": "RegisterEmpTest_RegistrationEmployeeTest",
+      "status": "Failed",
+      "startedUtc": "2026-05-25T10:46:54.0233745Z",
+      "finishedUtc": "2026-05-25T10:47:01.5289674Z",
+      "durationMs": 7505,
+      "durationDisplay": "7.505s",
+      "artifactFolder": "RegisterEmpTest_RegistrationEmployeeTest_20260525_161614185_30dd8f8b",
+      "healingMappingCount": 1,
+      "links": {
+        "video": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_161614185_30dd8f8b/video/page%4059ab11c7844a4c275ff97cf4832c317d.webm",
+        "trace": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_161614185_30dd8f8b/trace/trace.zip",
+        "screenshot": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_161614185_30dd8f8b/screenshots/failure_20260525_161654.png",
+        "logs": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_161614185_30dd8f8b/logs/execution.log",
+        "healing": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_161614185_30dd8f8b/healing/FailedLocatorStore.json"
+      }
+    },
+    {
+      "runId": "RegisterEmpTest_RegistrationEmployeeTest_20260525_155724858_fea4653f",
+      "testName": "RegisterEmpTest_RegistrationEmployeeTest",
+      "status": "Failed",
+      "startedUtc": "2026-05-25T10:27:34.266609Z",
+      "finishedUtc": "2026-05-25T10:27:38.9883703Z",
+      "durationMs": 4721,
+      "durationDisplay": "4.721s",
+      "artifactFolder": "RegisterEmpTest_RegistrationEmployeeTest_20260525_155724858_fea4653f",
+      "healingMappingCount": 1,
+      "links": {
+        "video": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_155724858_fea4653f/video/page%4075f9b81d05b253aaf30aa10fd8cda6b8.webm",
+        "trace": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_155724858_fea4653f/trace/trace.zip",
+        "screenshot": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_155724858_fea4653f/screenshots/failure_20260525_155734.png",
+        "logs": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_155724858_fea4653f/logs/execution.log",
+        "healing": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_155724858_fea4653f/healing/FailedLocatorStore.json"
+      }
+    },
+    {
+      "runId": "RegisterEmpTest_RegistrationEmployeeTest_20260525_155610173_6ee6eb83",
+      "testName": "RegisterEmpTest_RegistrationEmployeeTest",
+      "status": "Failed",
+      "startedUtc": "2026-05-25T10:26:49.2548795Z",
+      "finishedUtc": "2026-05-25T10:26:54.2153953Z",
+      "durationMs": 4960,
+      "durationDisplay": "4.960s",
+      "artifactFolder": "RegisterEmpTest_RegistrationEmployeeTest_20260525_155610173_6ee6eb83",
+      "healingMappingCount": 1,
+      "links": {
+        "video": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_155610173_6ee6eb83/video/page%40c3b26b5129cea2855e259baa09ebf86c.webm",
+        "trace": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_155610173_6ee6eb83/trace/trace.zip",
+        "screenshot": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_155610173_6ee6eb83/screenshots/failure_20260525_155649.png",
+        "logs": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_155610173_6ee6eb83/logs/execution.log",
+        "healing": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_155610173_6ee6eb83/healing/FailedLocatorStore.json"
+      }
+    },
+    {
+      "runId": "RegisterEmpTest_RegistrationEmployeeTest_20260525_155340260_d84a30d1",
+      "testName": "RegisterEmpTest_RegistrationEmployeeTest",
+      "status": "Failed",
+      "startedUtc": "2026-05-25T10:24:19.3721194Z",
+      "finishedUtc": "2026-05-25T10:24:25.2980099Z",
+      "durationMs": 5925,
+      "durationDisplay": "5.925s",
+      "artifactFolder": "RegisterEmpTest_RegistrationEmployeeTest_20260525_155340260_d84a30d1",
+      "healingMappingCount": 1,
+      "links": {
+        "video": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_155340260_d84a30d1/video/page%40701d1bd417d5b08569b5fd120328bb12.webm",
+        "trace": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_155340260_d84a30d1/trace/trace.zip",
+        "screenshot": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_155340260_d84a30d1/screenshots/failure_20260525_155419.png",
+        "logs": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_155340260_d84a30d1/logs/execution.log",
+        "healing": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_155340260_d84a30d1/healing/FailedLocatorStore.json"
+      }
+    },
+    {
+      "runId": "RegisterEmpTest_RegistrationEmployeeTest_20260525_154528330_02465ab8",
+      "testName": "RegisterEmpTest_RegistrationEmployeeTest",
+      "status": "Failed",
+      "startedUtc": "2026-05-25T10:16:07.8415878Z",
+      "finishedUtc": "2026-05-25T10:16:13.5525816Z",
+      "durationMs": 5710,
+      "durationDisplay": "5.710s",
+      "artifactFolder": "RegisterEmpTest_RegistrationEmployeeTest_20260525_154528330_02465ab8",
+      "healingMappingCount": 1,
+      "links": {
+        "video": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_154528330_02465ab8/video/page%40f7e9a65a83d2d51e4bcba952dde90837.webm",
+        "trace": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_154528330_02465ab8/trace/trace.zip",
+        "screenshot": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_154528330_02465ab8/screenshots/failure_20260525_154607.png",
+        "logs": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_154528330_02465ab8/logs/execution.log",
+        "healing": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_154528330_02465ab8/healing/FailedLocatorStore.json"
+      }
+    },
+    {
+      "runId": "RegisterEmpTest_RegistrationEmployeeTest_20260525_154331096_da3582df",
+      "testName": "RegisterEmpTest_RegistrationEmployeeTest",
+      "status": "Failed",
+      "startedUtc": "2026-05-25T10:14:09.8247122Z",
+      "finishedUtc": "2026-05-25T10:14:16.0862363Z",
+      "durationMs": 6261,
+      "durationDisplay": "6.261s",
+      "artifactFolder": "RegisterEmpTest_RegistrationEmployeeTest_20260525_154331096_da3582df",
+      "healingMappingCount": 1,
+      "links": {
+        "video": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_154331096_da3582df/video/page%40cfd49762492e649f28f30cd25c5b8cb4.webm",
+        "trace": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_154331096_da3582df/trace/trace.zip",
+        "screenshot": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_154331096_da3582df/screenshots/failure_20260525_154409.png",
+        "logs": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_154331096_da3582df/logs/execution.log",
+        "healing": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_154331096_da3582df/healing/FailedLocatorStore.json"
+      }
+    },
+    {
+      "runId": "RegisterEmpTest_RegistrationEmployeeTest_20260525_154224847_00568daa",
+      "testName": "RegisterEmpTest_RegistrationEmployeeTest",
+      "status": "Failed",
+      "startedUtc": "2026-05-25T10:12:36.7612567Z",
+      "finishedUtc": "2026-05-25T10:12:40.6391869Z",
+      "durationMs": 3877,
+      "durationDisplay": "3.877s",
+      "artifactFolder": "RegisterEmpTest_RegistrationEmployeeTest_20260525_154224847_00568daa",
+      "healingMappingCount": 1,
+      "links": {
+        "video": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_154224847_00568daa/video/page%4021b78b33dfd593c750ae412b4886834f.webm",
+        "trace": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_154224847_00568daa/trace/trace.zip",
+        "screenshot": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_154224847_00568daa/screenshots/failure_20260525_154236.png",
+        "logs": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_154224847_00568daa/logs/execution.log",
+        "healing": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_154224847_00568daa/healing/FailedLocatorStore.json"
+      }
+    },
+    {
+      "runId": "RegisterEmpTest_RegistrationEmployeeTest_20260525_152031530_3b258528",
+      "testName": "RegisterEmpTest_RegistrationEmployeeTest",
+      "status": "Failed",
+      "startedUtc": "2026-05-25T09:50:40.431413Z",
+      "finishedUtc": "2026-05-25T09:50:45.7606526Z",
+      "durationMs": 5329,
+      "durationDisplay": "5.329s",
+      "artifactFolder": "RegisterEmpTest_RegistrationEmployeeTest_20260525_152031530_3b258528",
+      "healingMappingCount": 1,
+      "links": {
+        "video": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_152031530_3b258528/video/page%409c8dce678915b9c027e204204c066c69.webm",
+        "trace": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_152031530_3b258528/trace/trace.zip",
+        "screenshot": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_152031530_3b258528/screenshots/failure_20260525_152040.png",
+        "logs": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_152031530_3b258528/logs/execution.log",
+        "healing": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_152031530_3b258528/healing/FailedLocatorStore.json"
+      }
+    },
+    {
+      "runId": "RegisterEmpTest_RegistrationEmployeeTest_20260525_151915006_bd5afccd",
+      "testName": "RegisterEmpTest_RegistrationEmployeeTest",
+      "status": "Failed",
+      "startedUtc": "2026-05-25T09:49:30.2547911Z",
+      "finishedUtc": "2026-05-25T09:49:35.4569651Z",
+      "durationMs": 5202,
+      "durationDisplay": "5.202s",
+      "artifactFolder": "RegisterEmpTest_RegistrationEmployeeTest_20260525_151915006_bd5afccd",
+      "healingMappingCount": 1,
+      "links": {
+        "video": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_151915006_bd5afccd/video/page%40f79a5d5222d9166c71e284c51bed800a.webm",
+        "trace": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_151915006_bd5afccd/trace/trace.zip",
+        "screenshot": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_151915006_bd5afccd/screenshots/failure_20260525_151930.png",
+        "logs": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_151915006_bd5afccd/logs/execution.log",
+        "healing": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_151915006_bd5afccd/healing/FailedLocatorStore.json"
+      }
+    },
+    {
+      "runId": "RegisterEmpTest_RegistrationEmployeeTest_20260525_151823452_93926002",
+      "testName": "RegisterEmpTest_RegistrationEmployeeTest",
+      "status": "Failed",
+      "startedUtc": "2026-05-25T09:48:38.2405021Z",
+      "finishedUtc": "2026-05-25T09:48:41.4020485Z",
+      "durationMs": 3161,
+      "durationDisplay": "3.161s",
+      "artifactFolder": "RegisterEmpTest_RegistrationEmployeeTest_20260525_151823452_93926002",
+      "healingMappingCount": 1,
+      "links": {
+        "video": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_151823452_93926002/video/page%40ed175c107b57383bd94ffb7a793eae12.webm",
+        "trace": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_151823452_93926002/trace/trace.zip",
+        "screenshot": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_151823452_93926002/screenshots/failure_20260525_151838.png",
+        "logs": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_151823452_93926002/logs/execution.log",
+        "healing": "http://127.0.0.1:8765/artifacts/RegisterEmpTest_RegistrationEmployeeTest_20260525_151823452_93926002/healing/FailedLocatorStore.json"
+      }
+    },
+    {
+      "runId": "CloneEditEmpTest_AddEditEmployeeTest_20260525_151034830_5cd6def9",
+      "testName": "CloneEditEmpTest_AddEditEmployeeTest",
+      "status": "Failed",
+      "startedUtc": "2026-05-25T09:41:25.0816859Z",
+      "finishedUtc": "2026-05-25T09:41:29.5665957Z",
+      "durationMs": 4484,
+      "durationDisplay": "4.484s",
+      "artifactFolder": "CloneEditEmpTest_AddEditEmployeeTest_20260525_151034830_5cd6def9",
+      "healingMappingCount": 1,
+      "links": {
+        "video": "http://127.0.0.1:8765/artifacts/CloneEditEmpTest_AddEditEmployeeTest_20260525_151034830_5cd6def9/video/page%4026ecca065423bf556726bd1a0b37aa8c.webm",
+        "trace": "http://127.0.0.1:8765/artifacts/CloneEditEmpTest_AddEditEmployeeTest_20260525_151034830_5cd6def9/trace/trace.zip",
+        "screenshot": "http://127.0.0.1:8765/artifacts/CloneEditEmpTest_AddEditEmployeeTest_20260525_151034830_5cd6def9/screenshots/failure_20260525_151125.png",
+        "logs": "http://127.0.0.1:8765/artifacts/CloneEditEmpTest_AddEditEmployeeTest_20260525_151034830_5cd6def9/logs/execution.log",
+        "healing": "http://127.0.0.1:8765/artifacts/CloneEditEmpTest_AddEditEmployeeTest_20260525_151034830_5cd6def9/healing/FailedLocatorStore.json"
+      }
+    },
     {
       "runId": "AISelfHeal_EditEmployee_Raj_R1_20260525_144441670_94124a3e",
       "testName": "AISelfHeal_EditEmployee_Raj_R1",
@@ -1485,333 +1809,135 @@
         "logs": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_R3_20260525_112609551_a08f33ba/logs/execution.log",
         "healing": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_R3_20260525_112609551_a08f33ba/healing/FailedLocatorStore.json"
       }
-    },
-    {
-      "runId": "AISelfHeal_EditEmployee_Raj_R1_20260525_112522772_7bb9d95a",
-      "testName": "AISelfHeal_EditEmployee_Raj_R1",
-      "status": "Failed",
-      "startedUtc": "2026-05-25T05:55:22.7790842Z",
-      "finishedUtc": "2026-05-25T05:56:09.3522489Z",
-      "durationMs": 46573,
-      "durationDisplay": "46.573s",
-      "artifactFolder": "AISelfHeal_EditEmployee_Raj_R1_20260525_112522772_7bb9d95a",
-      "healingMappingCount": 0,
-      "links": {
-        "video": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_R1_20260525_112522772_7bb9d95a/video/page%403780322318f7d57ded296c7e69a31b37.webm",
-        "trace": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_R1_20260525_112522772_7bb9d95a/trace/trace.zip",
-        "screenshot": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_R1_20260525_112522772_7bb9d95a/screenshots/failure_20260525_112603.png",
-        "logs": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_R1_20260525_112522772_7bb9d95a/logs/execution.log",
-        "healing": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_R1_20260525_112522772_7bb9d95a/healing/FailedLocatorStore.json"
-      }
-    },
-    {
-      "runId": "AISelfHeal_EditEmployee_Raj_R4_20260525_112429217_ed15fb6d",
-      "testName": "AISelfHeal_EditEmployee_Raj_R4",
-      "status": "Failed",
-      "startedUtc": "2026-05-25T05:54:29.2234267Z",
-      "finishedUtc": "2026-05-25T05:55:13.0678348Z",
-      "durationMs": 43844,
-      "durationDisplay": "43.844s",
-      "artifactFolder": "AISelfHeal_EditEmployee_Raj_R4_20260525_112429217_ed15fb6d",
-      "healingMappingCount": 0,
-      "links": {
-        "video": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_R4_20260525_112429217_ed15fb6d/video/page%40a76b66884d8a0737cfc9ce049f780851.webm",
-        "trace": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_R4_20260525_112429217_ed15fb6d/trace/trace.zip",
-        "screenshot": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_R4_20260525_112429217_ed15fb6d/screenshots/failure_20260525_112506.png",
-        "logs": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_R4_20260525_112429217_ed15fb6d/logs/execution.log",
-        "healing": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_R4_20260525_112429217_ed15fb6d/healing/FailedLocatorStore.json"
-      }
-    },
-    {
-      "runId": "AISelfHeal_EditEmployee_Test2_R1_20260525_112200741_34475d59",
-      "testName": "AISelfHeal_EditEmployee_Test2_R1",
-      "status": "Failed",
-      "startedUtc": "2026-05-25T05:52:00.746323Z",
-      "finishedUtc": "2026-05-25T05:52:41.3612637Z",
-      "durationMs": 40614,
-      "durationDisplay": "40.614s",
-      "artifactFolder": "AISelfHeal_EditEmployee_Test2_R1_20260525_112200741_34475d59",
-      "healingMappingCount": 0,
-      "links": {
-        "video": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Test2_R1_20260525_112200741_34475d59/video/page%407cba240ffd9e1097c93ded0521a149d9.webm",
-        "trace": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Test2_R1_20260525_112200741_34475d59/trace/trace.zip",
-        "screenshot": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Test2_R1_20260525_112200741_34475d59/screenshots/failure_20260525_112235.png",
-        "logs": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Test2_R1_20260525_112200741_34475d59/logs/execution.log",
-        "healing": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Test2_R1_20260525_112200741_34475d59/healing/FailedLocatorStore.json"
-      }
-    },
-    {
-      "runId": "AISelfHeal_EditEmployee_Raj_R1_20260525_102902733_fee0b898",
-      "testName": "AISelfHeal_EditEmployee_Raj_R1",
-      "status": "Failed",
-      "startedUtc": "2026-05-25T04:59:02.73713Z",
-      "finishedUtc": "2026-05-25T04:59:24.5748488Z",
-      "durationMs": 21837,
-      "durationDisplay": "21.837s",
-      "artifactFolder": "AISelfHeal_EditEmployee_Raj_R1_20260525_102902733_fee0b898",
-      "healingMappingCount": 2,
-      "links": {
-        "video": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_R1_20260525_102902733_fee0b898/video/page%40a23fbd4a221876741ecd0b180f424d3d.webm",
-        "trace": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_R1_20260525_102902733_fee0b898/trace/trace.zip",
-        "screenshot": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_R1_20260525_102902733_fee0b898/screenshots/failure_20260525_102921.png",
-        "logs": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_R1_20260525_102902733_fee0b898/logs/execution.log",
-        "healing": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_R1_20260525_102902733_fee0b898/healing/FailedLocatorStore.json"
-      }
-    },
-    {
-      "runId": "AISelfHeal_EditEmployee_Raj_R1_20260525_101627110_fe82c6c5",
-      "testName": "AISelfHeal_EditEmployee_Raj_R1",
-      "status": "Failed",
-      "startedUtc": "2026-05-25T04:46:27.113522Z",
-      "finishedUtc": "2026-05-25T04:46:55.8027699Z",
-      "durationMs": 28689,
-      "durationDisplay": "28.689s",
-      "artifactFolder": "AISelfHeal_EditEmployee_Raj_R1_20260525_101627110_fe82c6c5",
-      "healingMappingCount": 2,
-      "links": {
-        "video": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_R1_20260525_101627110_fe82c6c5/video/page%4050263c3bc808be0556da8111dd88ff01.webm",
-        "trace": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_R1_20260525_101627110_fe82c6c5/trace/trace.zip",
-        "screenshot": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_R1_20260525_101627110_fe82c6c5/screenshots/failure_20260525_101649.png",
-        "logs": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_R1_20260525_101627110_fe82c6c5/logs/execution.log",
-        "healing": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_R1_20260525_101627110_fe82c6c5/healing/FailedLocatorStore.json"
-      }
-    },
-    {
-      "runId": "AISelfHeal_EditEmployee_Raj_R1_20260525_100730087_e83806e6",
-      "testName": "AISelfHeal_EditEmployee_Raj_R1",
-      "status": "Failed",
-      "startedUtc": "2026-05-25T04:37:30.0937974Z",
-      "finishedUtc": "2026-05-25T04:38:17.25859Z",
-      "durationMs": 47164,
-      "durationDisplay": "47.164s",
-      "artifactFolder": "AISelfHeal_EditEmployee_Raj_R1_20260525_100730087_e83806e6",
-      "healingMappingCount": 2,
-      "links": {
-        "video": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_R1_20260525_100730087_e83806e6/video/page%401e969c6ff04a3fc7a333bef5abdddab7.webm",
-        "trace": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_R1_20260525_100730087_e83806e6/trace/trace.zip",
-        "screenshot": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_R1_20260525_100730087_e83806e6/screenshots/failure_20260525_100806.png",
-        "logs": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_R1_20260525_100730087_e83806e6/logs/execution.log",
-        "healing": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_R1_20260525_100730087_e83806e6/healing/FailedLocatorStore.json"
-      }
-    },
-    {
-      "runId": "CloneEditEmpTest_AddEditEmployeeTest_20260524_182448782_d7d6660f",
-      "testName": "CloneEditEmpTest_AddEditEmployeeTest",
-      "status": "Failed",
-      "startedUtc": "2026-05-24T12:55:50.0230472Z",
-      "finishedUtc": "2026-05-24T12:56:05.6817722Z",
-      "durationMs": 15658,
-      "durationDisplay": "15.658s",
-      "artifactFolder": "CloneEditEmpTest_AddEditEmployeeTest_20260524_182448782_d7d6660f",
-      "healingMappingCount": 2,
-      "links": {
-        "video": "http://127.0.0.1:8765/artifacts/CloneEditEmpTest_AddEditEmployeeTest_20260524_182448782_d7d6660f/video/page%403233ae5c216496d27b8090f4a6ba4f48.webm",
-        "trace": "http://127.0.0.1:8765/artifacts/CloneEditEmpTest_AddEditEmployeeTest_20260524_182448782_d7d6660f/trace/trace.zip",
-        "screenshot": "http://127.0.0.1:8765/artifacts/CloneEditEmpTest_AddEditEmployeeTest_20260524_182448782_d7d6660f/screenshots/failure_20260524_182550.png",
-        "logs": "http://127.0.0.1:8765/artifacts/CloneEditEmpTest_AddEditEmployeeTest_20260524_182448782_d7d6660f/logs/execution.log",
-        "healing": "http://127.0.0.1:8765/artifacts/CloneEditEmpTest_AddEditEmployeeTest_20260524_182448782_d7d6660f/healing/FailedLocatorStore.json"
-      }
-    },
-    {
-      "runId": "AISelfHeal_EditEmployee_Raj_R1_20260522_090817779_3a68dd73",
-      "testName": "AISelfHeal_EditEmployee_Raj_R1",
-      "status": "Passed",
-      "startedUtc": "2026-05-22T03:38:17.7915659Z",
-      "finishedUtc": "2026-05-22T03:39:02.532299Z",
-      "durationMs": 44740,
-      "durationDisplay": "44.740s",
-      "artifactFolder": "AISelfHeal_EditEmployee_Raj_R1_20260522_090817779_3a68dd73",
-      "healingMappingCount": 2,
-      "links": {
-        "video": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_R1_20260522_090817779_3a68dd73/video/page%407f4be3796273f408e6fd55370d72b06c.webm",
-        "trace": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_R1_20260522_090817779_3a68dd73/trace/trace.zip",
-        "screenshot": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_R1_20260522_090817779_3a68dd73/screenshots/final_20260522_090854.png",
-        "logs": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_R1_20260522_090817779_3a68dd73/logs/execution.log",
-        "healing": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_R1_20260522_090817779_3a68dd73/healing/FailedLocatorStore.json"
-      }
-    },
-    {
-      "runId": "AISelfHeal_EditEmployee_Raj_1_20260521_191423007_806f36bb",
-      "testName": "AISelfHeal_EditEmployee_Raj_1",
-      "status": "Passed",
-      "startedUtc": "2026-05-21T13:44:23.0106481Z",
-      "finishedUtc": "2026-05-21T13:44:49.9985838Z",
-      "durationMs": 26987,
-      "durationDisplay": "26.987s",
-      "artifactFolder": "AISelfHeal_EditEmployee_Raj_1_20260521_191423007_806f36bb",
-      "healingMappingCount": 2,
-      "links": {
-        "video": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_1_20260521_191423007_806f36bb/video/page%4032163f76bf6c2dc2db1a345e1db9bd4e.webm",
-        "trace": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_1_20260521_191423007_806f36bb/trace/trace.zip",
-        "screenshot": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_1_20260521_191423007_806f36bb/screenshots/final_20260521_191446.png",
-        "logs": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_1_20260521_191423007_806f36bb/logs/execution.log",
-        "healing": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_1_20260521_191423007_806f36bb/healing/FailedLocatorStore.json"
-      }
-    },
-    {
-      "runId": "AISelfHeal_EditEmployee_Raj_1_20260521_190719966_e0282c06",
-      "testName": "AISelfHeal_EditEmployee_Raj_1",
-      "status": "Passed",
-      "startedUtc": "2026-05-21T13:37:19.9697713Z",
-      "finishedUtc": "2026-05-21T13:37:50.3336974Z",
-      "durationMs": 30363,
-      "durationDisplay": "30.363s",
-      "artifactFolder": "AISelfHeal_EditEmployee_Raj_1_20260521_190719966_e0282c06",
-      "healingMappingCount": 2,
-      "links": {
-        "video": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_1_20260521_190719966_e0282c06/video/page%40d8bf17707844afbed4d0477d03c8531c.webm",
-        "trace": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_1_20260521_190719966_e0282c06/trace/trace.zip",
-        "screenshot": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_1_20260521_190719966_e0282c06/screenshots/final_20260521_190747.png",
-        "logs": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_1_20260521_190719966_e0282c06/logs/execution.log",
-        "healing": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_1_20260521_190719966_e0282c06/healing/FailedLocatorStore.json"
-      }
-    },
-    {
-      "runId": "AISelfHeal_EditEmployee_Raj_1_20260521_190033191_6762eb6e",
-      "testName": "AISelfHeal_EditEmployee_Raj_1",
-      "status": "Passed",
-      "startedUtc": "2026-05-21T13:30:33.1948984Z",
-      "finishedUtc": "2026-05-21T13:31:00.9192077Z",
-      "durationMs": 27724,
-      "durationDisplay": "27.724s",
-      "artifactFolder": "AISelfHeal_EditEmployee_Raj_1_20260521_190033191_6762eb6e",
-      "healingMappingCount": 2,
-      "links": {
-        "video": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_1_20260521_190033191_6762eb6e/video/page%4095bf5ec133fe29ce3e9206ca25ca1bba.webm",
-        "trace": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_1_20260521_190033191_6762eb6e/trace/trace.zip",
-        "screenshot": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_1_20260521_190033191_6762eb6e/screenshots/final_20260521_190057.png",
-        "logs": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_1_20260521_190033191_6762eb6e/logs/execution.log",
-        "healing": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_1_20260521_190033191_6762eb6e/healing/FailedLocatorStore.json"
-      }
-    },
-    {
-      "runId": "AISelfHeal_EditEmployee_Raj_20260521_184503394_a84b4a0e",
-      "testName": "AISelfHeal_EditEmployee_Raj",
-      "status": "Passed",
-      "startedUtc": "2026-05-21T13:15:03.3991018Z",
-      "finishedUtc": "2026-05-21T13:15:50.7983886Z",
-      "durationMs": 47399,
-      "durationDisplay": "47.399s",
-      "artifactFolder": "AISelfHeal_EditEmployee_Raj_20260521_184503394_a84b4a0e",
-      "healingMappingCount": 2,
-      "links": {
-        "video": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_20260521_184503394_a84b4a0e/video/page%400b671d657d0e769084d4af5b8b1ae624.webm",
-        "trace": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_20260521_184503394_a84b4a0e/trace/trace.zip",
-        "screenshot": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_20260521_184503394_a84b4a0e/screenshots/final_20260521_184539.png",
-        "logs": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_20260521_184503394_a84b4a0e/logs/execution.log",
-        "healing": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_20260521_184503394_a84b4a0e/healing/FailedLocatorStore.json"
-      }
-    },
-    {
-      "runId": "AISelfHeal_EditEmployee_Raj_20260521_173406833_2f7c1a8c",
-      "testName": "AISelfHeal_EditEmployee_Raj",
-      "status": "Passed",
-      "startedUtc": "2026-05-21T12:04:06.8383353Z",
-      "finishedUtc": "2026-05-21T12:04:39.7175607Z",
-      "durationMs": 32879,
-      "durationDisplay": "32.879s",
-      "artifactFolder": "AISelfHeal_EditEmployee_Raj_20260521_173406833_2f7c1a8c",
-      "healingMappingCount": 2,
-      "links": {
-        "video": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_20260521_173406833_2f7c1a8c/video/page%400f677f65b5955aa46bed42df5e8a2b2e.webm",
-        "trace": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_20260521_173406833_2f7c1a8c/trace/trace.zip",
-        "screenshot": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_20260521_173406833_2f7c1a8c/screenshots/final_20260521_173433.png",
-        "logs": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_20260521_173406833_2f7c1a8c/logs/execution.log",
-        "healing": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_20260521_173406833_2f7c1a8c/healing/FailedLocatorStore.json"
-      }
-    },
-    {
-      "runId": "AISelfHeal_EditEmployee_Raj_20260521_144530193_1c80557f",
-      "testName": "AISelfHeal_EditEmployee_Raj",
-      "status": "Passed",
-      "startedUtc": "2026-05-21T09:15:30.2006883Z",
-      "finishedUtc": "2026-05-21T09:16:08.0423388Z",
-      "durationMs": 37841,
-      "durationDisplay": "37.841s",
-      "artifactFolder": "AISelfHeal_EditEmployee_Raj_20260521_144530193_1c80557f",
-      "healingMappingCount": 2,
-      "links": {
-        "video": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_20260521_144530193_1c80557f/video/page%403c9601783d2d7c0a78d09f7f2c82c222.webm",
-        "trace": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_20260521_144530193_1c80557f/trace/trace.zip",
-        "screenshot": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_20260521_144530193_1c80557f/screenshots/final_20260521_144603.png",
-        "logs": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_20260521_144530193_1c80557f/logs/execution.log",
-        "healing": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_20260521_144530193_1c80557f/healing/FailedLocatorStore.json"
-      }
-    },
-    {
-      "runId": "AISelfHeal_EditEmployee_Raj_20260521_134958480_581ff667",
-      "testName": "AISelfHeal_EditEmployee_Raj",
-      "status": "Passed",
-      "startedUtc": "2026-05-21T08:19:58.4862656Z",
-      "finishedUtc": "2026-05-21T08:20:30.0206292Z",
-      "durationMs": 31534,
-      "durationDisplay": "31.534s",
-      "artifactFolder": "AISelfHeal_EditEmployee_Raj_20260521_134958480_581ff667",
-      "healingMappingCount": 2,
-      "links": {
-        "video": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_20260521_134958480_581ff667/video/page%40475171fdc4c530a1c57e741fffcb5811.webm",
-        "trace": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_20260521_134958480_581ff667/trace/trace.zip",
-        "screenshot": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_20260521_134958480_581ff667/screenshots/final_20260521_135024.png",
-        "logs": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_20260521_134958480_581ff667/logs/execution.log",
-        "healing": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_20260521_134958480_581ff667/healing/FailedLocatorStore.json"
-      }
-    },
-    {
-      "runId": "AISelfHeal_EditEmployee_Raj_20260521_134822882_5accaf5d",
-      "testName": "AISelfHeal_EditEmployee_Raj",
-      "status": "Passed",
-      "startedUtc": "2026-05-21T08:18:22.887808Z",
-      "finishedUtc": "2026-05-21T08:19:05.3170432Z",
-      "durationMs": 42429,
-      "durationDisplay": "42.429s",
-      "artifactFolder": "AISelfHeal_EditEmployee_Raj_20260521_134822882_5accaf5d",
-      "healingMappingCount": 2,
-      "links": {
-        "video": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_20260521_134822882_5accaf5d/video/page%404cccede513ee4835063a34d5ec1f17ad.webm",
-        "trace": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_20260521_134822882_5accaf5d/trace/trace.zip",
-        "screenshot": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_20260521_134822882_5accaf5d/screenshots/final_20260521_134856.png",
-        "logs": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_20260521_134822882_5accaf5d/logs/execution.log",
-        "healing": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_20260521_134822882_5accaf5d/healing/FailedLocatorStore.json"
-      }
-    },
-    {
-      "runId": "AISelfHeal_EditEmployee_Raj_20260521_131028098_d4bfd7ce",
-      "testName": "AISelfHeal_EditEmployee_Raj",
-      "status": "Passed",
-      "startedUtc": "2026-05-21T07:40:28.1020598Z",
-      "finishedUtc": "2026-05-21T07:41:13.5874282Z",
-      "durationMs": 45485,
-      "durationDisplay": "45.485s",
-      "artifactFolder": "AISelfHeal_EditEmployee_Raj_20260521_131028098_d4bfd7ce",
-      "healingMappingCount": 2,
-      "links": {
-        "video": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_20260521_131028098_d4bfd7ce/video/page%40229e23dcadaf2d673669a84470067847.webm",
-        "trace": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_20260521_131028098_d4bfd7ce/trace/trace.zip",
-        "screenshot": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_20260521_131028098_d4bfd7ce/screenshots/final_20260521_131108.png",
-        "logs": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_20260521_131028098_d4bfd7ce/logs/execution.log",
-        "healing": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_20260521_131028098_d4bfd7ce/healing/FailedLocatorStore.json"
-      }
-    },
-    {
-      "runId": "AISelfHeal_EditEmployee_Raj_20260521_115238405_87720ba5",
-      "testName": "AISelfHeal_EditEmployee_Raj_20260521",
-      "status": "Failed",
-      "startedUtc": "2026-05-21T06:22:38.4107681Z",
-      "finishedUtc": "2026-05-21T06:22:38.4107681Z",
-      "durationMs": 0,
-      "durationDisplay": "0 ms",
-      "artifactFolder": "AISelfHeal_EditEmployee_Raj_20260521_115238405_87720ba5",
-      "healingMappingCount": 2,
-      "links": {
-        "video": null,
-        "trace": null,
-        "screenshot": null,
-        "logs": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_20260521_115238405_87720ba5/logs/execution.log",
-        "healing": "http://127.0.0.1:8765/artifacts/AISelfHeal_EditEmployee_Raj_20260521_115238405_87720ba5/healing/FailedLocatorStore.json"
-      }
     }
   ],
   "timeline": [
+    {
+      "testName": "RegisterEmpTest_RegistrationEmployeeTest",
+      "status": "Failed",
+      "startedUtc": "2026-05-25T11:48:46.2939023Z",
+      "finishedUtc": "2026-05-25T11:48:51.7941505Z",
+      "durationMs": 5500
+    },
+    {
+      "testName": "RegisterEmpTest_RegistrationEmployeeTest",
+      "status": "Passed",
+      "startedUtc": "2026-05-25T11:27:55.8813706Z",
+      "finishedUtc": "2026-05-25T11:28:02.8336884Z",
+      "durationMs": 6952
+    },
+    {
+      "testName": "RegisterEmpTest_RegistrationEmployeeTest",
+      "status": "Failed",
+      "startedUtc": "2026-05-25T11:24:53.1488916Z",
+      "finishedUtc": "2026-05-25T11:24:59.6213777Z",
+      "durationMs": 6472
+    },
+    {
+      "testName": "RegisterEmpTest_RegistrationEmployeeTest",
+      "status": "Passed",
+      "startedUtc": "2026-05-25T11:06:05.8994114Z",
+      "finishedUtc": "2026-05-25T11:06:12.1043628Z",
+      "durationMs": 6204
+    },
+    {
+      "testName": "RegisterEmpTest_RegistrationEmployeeTest",
+      "status": "Failed",
+      "startedUtc": "2026-05-25T10:57:59.1070714Z",
+      "finishedUtc": "2026-05-25T10:58:01.6233742Z",
+      "durationMs": 2516
+    },
+    {
+      "testName": "RegisterEmpTest_RegistrationEmployeeTest",
+      "status": "Passed",
+      "startedUtc": "2026-05-25T10:50:16.8648813Z",
+      "finishedUtc": "2026-05-25T10:50:21.6007101Z",
+      "durationMs": 4735
+    },
+    {
+      "testName": "RegisterEmpTest_RegistrationEmployeeTest",
+      "status": "Failed",
+      "startedUtc": "2026-05-25T10:49:03.1291699Z",
+      "finishedUtc": "2026-05-25T10:49:08.8148489Z",
+      "durationMs": 5685
+    },
+    {
+      "testName": "RegisterEmpTest_RegistrationEmployeeTest",
+      "status": "Failed",
+      "startedUtc": "2026-05-25T10:46:54.0233745Z",
+      "finishedUtc": "2026-05-25T10:47:01.5289674Z",
+      "durationMs": 7505
+    },
+    {
+      "testName": "RegisterEmpTest_RegistrationEmployeeTest",
+      "status": "Failed",
+      "startedUtc": "2026-05-25T10:27:34.266609Z",
+      "finishedUtc": "2026-05-25T10:27:38.9883703Z",
+      "durationMs": 4721
+    },
+    {
+      "testName": "RegisterEmpTest_RegistrationEmployeeTest",
+      "status": "Failed",
+      "startedUtc": "2026-05-25T10:26:49.2548795Z",
+      "finishedUtc": "2026-05-25T10:26:54.2153953Z",
+      "durationMs": 4960
+    },
+    {
+      "testName": "RegisterEmpTest_RegistrationEmployeeTest",
+      "status": "Failed",
+      "startedUtc": "2026-05-25T10:24:19.3721194Z",
+      "finishedUtc": "2026-05-25T10:24:25.2980099Z",
+      "durationMs": 5925
+    },
+    {
+      "testName": "RegisterEmpTest_RegistrationEmployeeTest",
+      "status": "Failed",
+      "startedUtc": "2026-05-25T10:16:07.8415878Z",
+      "finishedUtc": "2026-05-25T10:16:13.5525816Z",
+      "durationMs": 5710
+    },
+    {
+      "testName": "RegisterEmpTest_RegistrationEmployeeTest",
+      "status": "Failed",
+      "startedUtc": "2026-05-25T10:14:09.8247122Z",
+      "finishedUtc": "2026-05-25T10:14:16.0862363Z",
+      "durationMs": 6261
+    },
+    {
+      "testName": "RegisterEmpTest_RegistrationEmployeeTest",
+      "status": "Failed",
+      "startedUtc": "2026-05-25T10:12:36.7612567Z",
+      "finishedUtc": "2026-05-25T10:12:40.6391869Z",
+      "durationMs": 3877
+    },
+    {
+      "testName": "RegisterEmpTest_RegistrationEmployeeTest",
+      "status": "Failed",
+      "startedUtc": "2026-05-25T09:50:40.431413Z",
+      "finishedUtc": "2026-05-25T09:50:45.7606526Z",
+      "durationMs": 5329
+    },
+    {
+      "testName": "RegisterEmpTest_RegistrationEmployeeTest",
+      "status": "Failed",
+      "startedUtc": "2026-05-25T09:49:30.2547911Z",
+      "finishedUtc": "2026-05-25T09:49:35.4569651Z",
+      "durationMs": 5202
+    },
+    {
+      "testName": "RegisterEmpTest_RegistrationEmployeeTest",
+      "status": "Failed",
+      "startedUtc": "2026-05-25T09:48:38.2405021Z",
+      "finishedUtc": "2026-05-25T09:48:41.4020485Z",
+      "durationMs": 3161
+    },
+    {
+      "testName": "CloneEditEmpTest_AddEditEmployeeTest",
+      "status": "Failed",
+      "startedUtc": "2026-05-25T09:41:25.0816859Z",
+      "finishedUtc": "2026-05-25T09:41:29.5665957Z",
+      "durationMs": 4484
+    },
     {
       "testName": "AISelfHeal_EditEmployee_Raj_R1",
       "status": "Passed",
@@ -2385,132 +2511,6 @@
       "startedUtc": "2026-05-25T05:56:09.5628013Z",
       "finishedUtc": "2026-05-25T05:56:50.3098689Z",
       "durationMs": 40747
-    },
-    {
-      "testName": "AISelfHeal_EditEmployee_Raj_R1",
-      "status": "Failed",
-      "startedUtc": "2026-05-25T05:55:22.7790842Z",
-      "finishedUtc": "2026-05-25T05:56:09.3522489Z",
-      "durationMs": 46573
-    },
-    {
-      "testName": "AISelfHeal_EditEmployee_Raj_R4",
-      "status": "Failed",
-      "startedUtc": "2026-05-25T05:54:29.2234267Z",
-      "finishedUtc": "2026-05-25T05:55:13.0678348Z",
-      "durationMs": 43844
-    },
-    {
-      "testName": "AISelfHeal_EditEmployee_Test2_R1",
-      "status": "Failed",
-      "startedUtc": "2026-05-25T05:52:00.746323Z",
-      "finishedUtc": "2026-05-25T05:52:41.3612637Z",
-      "durationMs": 40614
-    },
-    {
-      "testName": "AISelfHeal_EditEmployee_Raj_R1",
-      "status": "Failed",
-      "startedUtc": "2026-05-25T04:59:02.73713Z",
-      "finishedUtc": "2026-05-25T04:59:24.5748488Z",
-      "durationMs": 21837
-    },
-    {
-      "testName": "AISelfHeal_EditEmployee_Raj_R1",
-      "status": "Failed",
-      "startedUtc": "2026-05-25T04:46:27.113522Z",
-      "finishedUtc": "2026-05-25T04:46:55.8027699Z",
-      "durationMs": 28689
-    },
-    {
-      "testName": "AISelfHeal_EditEmployee_Raj_R1",
-      "status": "Failed",
-      "startedUtc": "2026-05-25T04:37:30.0937974Z",
-      "finishedUtc": "2026-05-25T04:38:17.25859Z",
-      "durationMs": 47164
-    },
-    {
-      "testName": "CloneEditEmpTest_AddEditEmployeeTest",
-      "status": "Failed",
-      "startedUtc": "2026-05-24T12:55:50.0230472Z",
-      "finishedUtc": "2026-05-24T12:56:05.6817722Z",
-      "durationMs": 15658
-    },
-    {
-      "testName": "AISelfHeal_EditEmployee_Raj_R1",
-      "status": "Passed",
-      "startedUtc": "2026-05-22T03:38:17.7915659Z",
-      "finishedUtc": "2026-05-22T03:39:02.532299Z",
-      "durationMs": 44740
-    },
-    {
-      "testName": "AISelfHeal_EditEmployee_Raj_1",
-      "status": "Passed",
-      "startedUtc": "2026-05-21T13:44:23.0106481Z",
-      "finishedUtc": "2026-05-21T13:44:49.9985838Z",
-      "durationMs": 26987
-    },
-    {
-      "testName": "AISelfHeal_EditEmployee_Raj_1",
-      "status": "Passed",
-      "startedUtc": "2026-05-21T13:37:19.9697713Z",
-      "finishedUtc": "2026-05-21T13:37:50.3336974Z",
-      "durationMs": 30363
-    },
-    {
-      "testName": "AISelfHeal_EditEmployee_Raj_1",
-      "status": "Passed",
-      "startedUtc": "2026-05-21T13:30:33.1948984Z",
-      "finishedUtc": "2026-05-21T13:31:00.9192077Z",
-      "durationMs": 27724
-    },
-    {
-      "testName": "AISelfHeal_EditEmployee_Raj",
-      "status": "Passed",
-      "startedUtc": "2026-05-21T13:15:03.3991018Z",
-      "finishedUtc": "2026-05-21T13:15:50.7983886Z",
-      "durationMs": 47399
-    },
-    {
-      "testName": "AISelfHeal_EditEmployee_Raj",
-      "status": "Passed",
-      "startedUtc": "2026-05-21T12:04:06.8383353Z",
-      "finishedUtc": "2026-05-21T12:04:39.7175607Z",
-      "durationMs": 32879
-    },
-    {
-      "testName": "AISelfHeal_EditEmployee_Raj",
-      "status": "Passed",
-      "startedUtc": "2026-05-21T09:15:30.2006883Z",
-      "finishedUtc": "2026-05-21T09:16:08.0423388Z",
-      "durationMs": 37841
-    },
-    {
-      "testName": "AISelfHeal_EditEmployee_Raj",
-      "status": "Passed",
-      "startedUtc": "2026-05-21T08:19:58.4862656Z",
-      "finishedUtc": "2026-05-21T08:20:30.0206292Z",
-      "durationMs": 31534
-    },
-    {
-      "testName": "AISelfHeal_EditEmployee_Raj",
-      "status": "Passed",
-      "startedUtc": "2026-05-21T08:18:22.887808Z",
-      "finishedUtc": "2026-05-21T08:19:05.3170432Z",
-      "durationMs": 42429
-    },
-    {
-      "testName": "AISelfHeal_EditEmployee_Raj",
-      "status": "Passed",
-      "startedUtc": "2026-05-21T07:40:28.1020598Z",
-      "finishedUtc": "2026-05-21T07:41:13.5874282Z",
-      "durationMs": 45485
-    },
-    {
-      "testName": "AISelfHeal_EditEmployee_Raj_20260521",
-      "status": "Failed",
-      "startedUtc": "2026-05-21T06:22:38.4107681Z",
-      "finishedUtc": "2026-05-21T06:22:38.4107681Z",
-      "durationMs": 0
     }
   ]
 }
