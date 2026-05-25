@@ -1,13 +1,9 @@
 ﻿========== AI SELF-HEALING REPORT ==========
-Generated On : 2026-05-21T23:29:54.1500830+05:30
-Store File    : D:\EaAutomationFramework\EAFramework\AIHealing\FailedLocatorStore.json
-Total Mappings: 2
+Generated On : 2026-05-25T14:45:18.8678661+05:30
+Store File    : C:\EaAutomationFramework\EAFramework\AIHealing\FailedLocatorStore.json
+Total Mappings: 1
 
-[2026-05-21 23:29:54]
-  Original: form.search-card input[name='searchTerm']xxx
-  Healed  : [name='searchTerm']
-
-[2026-05-21 23:29:54]
-  Original: .form-card-body .form-row-2 #Email12
-  Healed  : .form-card-body
+[2026-05-25 14:45:18]
+  Original: .form-card-body .form-row-2 #Salary2
+  Healed  : .form-card-body .form-row-2 #Salary
 

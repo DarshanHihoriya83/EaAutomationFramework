@@ -1,5 +1,11 @@
 ﻿namespace EaTestAutomation.Utilities
 {
+    /// <summary>Typo alias for <see cref="SpecialExtensions"/> (legacy tests).</summary>
+    public static class SpecialExtenstions
+    {
+        public static string GetExcelPath() => SpecialExtensions.GetExcelPath();
+    }
+
     public static class SpecialExtensions
     {
         /// <summary>

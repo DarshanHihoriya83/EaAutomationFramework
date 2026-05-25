@@ -1,13 +1,18 @@
 ﻿using EAFramework.Base;
 using Microsoft.Playwright;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace EaTestAutomation.Pages
 {
-    public class EditEMPPage : PageBase
+    public class CloneEditEmpPage : PageBase
     {
-        public EditEMPPage(IPage page) : base(page) { }
-
-
+        public CloneEditEmpPage(IPage page) : base(page)
+        {
+        }
 
         private ILocator NavigationBar => Locator("nav");
         private ILocator EmployeesDiv => NavigationBar.Locator(".container");
@@ -93,6 +98,7 @@ namespace EaTestAutomation.Pages
         {
             await ClickAsync(SaveChaangesButton);
         }
+
 
     }
 }

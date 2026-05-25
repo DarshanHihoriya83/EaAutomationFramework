@@ -11,22 +11,30 @@ namespace EaTestAutomation.Test
 
         public static IEnumerable<object[]> LoadEmployeeData()
         {
-            foreach (ExcelDataLoader.EmployeeExcelRow row in ExcelDataLoader.LoadEmployeeRows(WorksheetName))
+            foreach (ExcelDataLoader.ExcelDataRow row in ExcelDataLoader.ReadRows(WorksheetName))
             {
-                string testName = $"AddEmployee_{row.Name}_R{row.RowIndex}";
+                string name = row.Cell(1);
+                string age = row.Cell(2);
+                string salary = row.Cell(3);
+                string durationWorked = row.Cell(4);
+                string grade = row.Cell(5);
+                string email = row.Cell(6);
+                string reference = row.Reference;
 
-                ExcelTestTracker.TrackTestRow(testName, row.RowIndex, row.Reference);
+                string testName = $"AddEmployee_{name}_R{row.RowIndex}";
+
+                ExcelTestTracker.TrackTestRow(testName, row.RowIndex, reference);
 
                 yield return new object[]
                 {
-                    row.Name,
-                    row.Age,
-                    row.Salary,
-                    row.DurationWorked,
-                    row.Grade,
-                    row.Email,
+                    name,
+                    age,
+                    salary,
+                    durationWorked,
+                    grade,
+                    email,
                     testName,
-                    row.Reference
+                    reference
                 };
             }
         }
@@ -55,21 +63,13 @@ namespace EaTestAutomation.Test
                 await Page.GotoAsync(_testSettings.Applicationurl);
 
                 await employeePage.ClickonEmployeeButton();
-
                 await employeePage.ClickonNewEmployeeButton();
-
                 await employeePage.FillFullname(name);
-
                 await employeePage.FillAge(age);
-
                 await employeePage.FillSalaryInput(salary);
-
                 await employeePage.FillDurationWorkedInput(durationWorked);
-
                 await employeePage.SelectDropdownOptionAsync("#Grade", grade);
-
                 await employeePage.FillEmailInput(email);
-
                 await employeePage.ClickonCreateEmployeeButton();
 
                 testResult = true;

@@ -123,7 +123,13 @@ namespace EAFramework.AIHealing
                 await TryHealPlaceholderInputAsync(failedSelector);
 
             healedSelector ??=
+                await TryHealIdTypoSuffixAsync(failedSelector);
+
+            healedSelector ??=
                 await TryBuiltInAlternativesAsync(failedSelector);
+
+            healedSelector ??=
+                await TryHealEmployeeTableEditAsync(failedSelector);
 
             healedSelector ??=
                 await TryPlaywrightSemanticLocatorAsync(failedSelector);
@@ -198,29 +204,170 @@ namespace EAFramework.AIHealing
             string failedSelector,
             string healedSelector)
         {
+            string h = healedSelector.Trim();
+
+            if (h.Length == 0)
+            {
+                return false;
+            }
+
             bool inputish =
                 failedSelector.Contains("input[", StringComparison.OrdinalIgnoreCase)
                 || failedSelector.Contains("placeholder=", StringComparison.OrdinalIgnoreCase);
 
-            if (!inputish)
+            if (inputish)
             {
-                return false;
+                if (h.Contains("input[", StringComparison.OrdinalIgnoreCase)
+                    || h.Contains("placeholder=", StringComparison.OrdinalIgnoreCase)
+                    || h.Contains("@name=", StringComparison.OrdinalIgnoreCase))
+                {
+                    return false;
+                }
+
+                // lone class selector — usually a layout wrapper, not the control.
+                return h.StartsWith(".", StringComparison.Ordinal)
+                       && h.IndexOf(' ') < 0
+                       && h.IndexOf(">", StringComparison.Ordinal) < 0;
             }
 
-            string h = healedSelector.Trim();
+            bool idish = failedSelector.Contains('#', StringComparison.Ordinal);
 
-            if (h.Length == 0
-                || h.Contains("input[", StringComparison.OrdinalIgnoreCase)
-                || h.Contains("placeholder=", StringComparison.OrdinalIgnoreCase)
-                || h.Contains("@name=", StringComparison.OrdinalIgnoreCase))
+            if (idish
+                && h.StartsWith(".", StringComparison.Ordinal)
+                && !h.Contains('#', StringComparison.Ordinal)
+                && !h.Contains("input", StringComparison.OrdinalIgnoreCase)
+                && !h.Contains("select", StringComparison.OrdinalIgnoreCase)
+                && !h.Contains("textarea", StringComparison.OrdinalIgnoreCase))
             {
-                return false;
+                return true;
             }
 
-            // lone class selector — usually a layout wrapper, not the control.
-            return h.StartsWith(".", StringComparison.Ordinal)
-                   && h.IndexOf(' ') < 0
-                   && h.IndexOf(">", StringComparison.Ordinal) < 0;
+            return false;
+        }
+
+        /// <summary>
+        /// Heals mistaken ids such as <c>#Salary32</c> → <c>#Salary</c> (trailing digits on a known field id).
+        /// </summary>
+        private async Task<string?> TryHealIdTypoSuffixAsync(string failedSelector)
+        {
+            var idMatch = Regex.Match(
+                failedSelector,
+                @"#([A-Za-z][A-Za-z0-9_]*?)(\d+)",
+                RegexOptions.IgnoreCase);
+
+            if (!idMatch.Success)
+            {
+                return null;
+            }
+
+            string baseId = idMatch.Groups[1].Value;
+            string prefix = failedSelector[..idMatch.Index];
+            string suffix = failedSelector[(idMatch.Index + idMatch.Length)..];
+
+            List<string> candidates = new()
+            {
+                $"{prefix}#{baseId}{suffix}".Trim(),
+                $"#{baseId}",
+                $"[id='{baseId}']",
+                $".form-card-body .form-row-2 #{baseId}",
+                $"input#{baseId}",
+            };
+
+            foreach (string candidate in candidates.Distinct())
+            {
+                if (DiscardSuspiciousHeal(failedSelector, candidate) == null)
+                {
+                    continue;
+                }
+
+                if (await IsSelectorUsableAsync(candidate))
+                {
+                    return candidate;
+                }
+
+                ILocator loc = _page.Locator(candidate);
+
+                if (await loc.CountAsync() > 0)
+                {
+                    return candidate;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Heals employee-list edit links (row by <c>.emp-name</c> + <c>.btn-edit</c>), matching live DOM structure.
+        /// </summary>
+        private async Task<string?> TryHealEmployeeTableEditAsync(string failedSelector)
+        {
+            if (!failedSelector.Contains("emp-name", StringComparison.OrdinalIgnoreCase)
+                || !failedSelector.Contains("btn-edit", StringComparison.OrdinalIgnoreCase))
+            {
+                return null;
+            }
+
+            var nameMatch = Regex.Match(
+                failedSelector,
+                @"normalize-space\(\)\s*=\s*'([^']+)'",
+                RegexOptions.IgnoreCase);
+
+            if (!nameMatch.Success)
+            {
+                nameMatch = Regex.Match(
+                    failedSelector,
+                    @"normalize-space\(\)\s*=\s*""([^""]+)""",
+                    RegexOptions.IgnoreCase);
+            }
+
+            if (!nameMatch.Success)
+            {
+                return null;
+            }
+
+            string employeeName = nameMatch.Groups[1].Value;
+
+            List<string> candidates = new()
+            {
+                $".employee-table-card table tbody tr:has(.emp-name:text-is('{employeeName}')) .action-group a.btn-edit",
+                $".employee-table-card table tbody tr >> .emp-name:text-is('{employeeName}') >> .. >> .action-group a.btn-edit",
+                $"xpath=//div[contains(@class,'employee-table-card')]//table//tbody//tr[.//*[contains(@class,'emp-name') and normalize-space()='{employeeName}']]//a[contains(@class,'btn-edit')]",
+            };
+
+            foreach (string candidate in candidates)
+            {
+                if (DiscardSuspiciousHeal(failedSelector, candidate) == null)
+                {
+                    continue;
+                }
+
+                ILocator loc = _page.Locator(candidate);
+
+                if (await loc.CountAsync() == 0)
+                {
+                    continue;
+                }
+
+                try
+                {
+                    await loc.First.WaitForAsync(new()
+                    {
+                        State = WaitForSelectorState.Visible,
+                        Timeout = 10000
+                    });
+
+                    return candidate;
+                }
+                catch
+                {
+                    if (await loc.First.CountAsync() > 0)
+                    {
+                        return candidate;
+                    }
+                }
+            }
+
+            return null;
         }
 
         /// <summary>

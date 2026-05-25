@@ -11,22 +11,30 @@ namespace EaTestAutomation.Test
 
         public static IEnumerable<object[]> LoadEditEmployeeData()
         {
-            foreach (ExcelDataLoader.EmployeeExcelRow row in ExcelDataLoader.LoadEmployeeRows(WorksheetName))
+            foreach (ExcelDataLoader.ExcelDataRow row in ExcelDataLoader.ReadRows(WorksheetName))
             {
-                string testName = $"EditEmployee_{row.Name}_R{row.RowIndex}";
+                string name = row.Cell(1);
+                string age = row.Cell(2);
+                string salary = row.Cell(3);
+                string durationWorked = row.Cell(4);
+                string grade = row.Cell(5);
+                string email = row.Cell(6);
+                string reference = row.Reference;
 
-                ExcelTestTracker.TrackTestRow(testName, row.RowIndex, row.Reference);
+                string testName = $"EditEmployee_{name}_R{row.RowIndex}";
+
+                ExcelTestTracker.TrackTestRow(testName, row.RowIndex, reference);
 
                 yield return new object[]
                 {
-                    row.Name,
-                    row.Age,
-                    row.Salary,
-                    row.DurationWorked,
-                    row.Grade,
-                    row.Email,
+                    name,
+                    age,
+                    salary,
+                    durationWorked,
+                    grade,
+                    email,
                     testName,
-                    row.Reference
+                    reference
                 };
             }
         }
@@ -59,11 +67,10 @@ namespace EaTestAutomation.Test
                 await _EditEMPPage.EditFullname("Raj");
                 await _EditEMPPage.EditEditAge(age);
                 await _EditEMPPage.EditSalaryInput(salary);
-                await _EditEMPPage.EditDurationwork(durationWorked);     
+                await _EditEMPPage.EditDurationwork(durationWorked);
                 await _EditEMPPage.EditGradeSelectDropdownOptionAsync("#Grade", grade);
                 await _EditEMPPage.EditEmailInput(email);
                 await _EditEMPPage.ClickonSaveChangesButton();
-
 
                 testResult = true;
             }

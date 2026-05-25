@@ -3,57 +3,76 @@ using ClosedXML.Excel;
 namespace EaTestAutomation.Utilities
 {
     /// <summary>
-    /// Reads data rows from framework Excel test data worksheets.
+    /// Reads Excel worksheets row-by-row with explicit column access (same pattern as FreeGoodTest).
     /// </summary>
     public static class ExcelDataLoader
     {
-        public sealed class EmployeeExcelRow
+        /// <summary>
+        /// One data row from a worksheet (header row skipped). Use <see cref="Cell"/> for column values.
+        /// </summary>
+        public sealed class ExcelDataRow
         {
-            public int RowIndex { get; init; }
-            public string Name { get; init; } = "";
-            public string Age { get; init; } = "";
-            public string Salary { get; init; } = "";
-            public string DurationWorked { get; init; } = "";
-            public string Grade { get; init; } = "";
-            public string Email { get; init; } = "";
-            public string Reference => string.IsNullOrWhiteSpace(Email) ? Name : Email;
+            private readonly Dictionary<int, string> _cells;
+
+            internal ExcelDataRow(IXLRow row, int rowIndex)
+            {
+                RowIndex = rowIndex;
+                _cells = new Dictionary<int, string>();
+
+                int lastColumn = row.LastCellUsed()?.Address.ColumnNumber ?? 1;
+
+                for (int column = 1; column <= lastColumn; column++)
+                {
+                    _cells[column] = row.Cell(column).GetString().Trim();
+                }
+            }
+
+            /// <summary>1-based data row index used by <see cref="ExcelTestTracker"/>.</summary>
+            public int RowIndex { get; }
+
+            /// <summary>Gets trimmed cell text for a 1-based column index.</summary>
+            public string Cell(int columnNumber) =>
+                _cells.TryGetValue(columnNumber, out string? value) ? value : string.Empty;
+
+            public string Reference =>
+                string.IsNullOrWhiteSpace(Cell(6)) ? Cell(1) : Cell(6);
+        }
+
+        public static bool WorksheetExists(string worksheetName)
+        {
+            string path = SpecialExtensions.GetExcelPath();
+
+            using var workbook = new XLWorkbook(path);
+
+            return workbook.Worksheets.Contains(worksheetName);
         }
 
         /// <summary>
-        /// Returns all non-empty data rows (skips header row 1).
+        /// Opens <c>TestData.xlsx</c> and yields non-empty data rows from the named worksheet.
         /// </summary>
-        public static List<EmployeeExcelRow> LoadEmployeeRows(string worksheetName)
+        /// <param name="worksheetName">Worksheet tab name.</param>
+        /// <param name="keyColumn">First column to check; blank rows are skipped (default: column 1).</param>
+        public static IEnumerable<ExcelDataRow> ReadRows(
+            string worksheetName,
+            int keyColumn = 1)
         {
             string path = SpecialExtensions.GetExcelPath();
+
             using var workbook = new XLWorkbook(path);
             var worksheet = workbook.Worksheet(worksheetName);
-
             var rows = worksheet.RowsUsed().Skip(1).ToList();
-            var result = new List<EmployeeExcelRow>();
 
             for (int i = 0; i < rows.Count; i++)
             {
                 var row = rows[i];
-                string name = row.Cell(1).GetString().Trim();
 
-                if (string.IsNullOrWhiteSpace(name))
+                if (string.IsNullOrWhiteSpace(row.Cell(keyColumn).GetString().Trim()))
                 {
                     continue;
                 }
 
-                result.Add(new EmployeeExcelRow
-                {
-                    RowIndex = i + 1,
-                    Name = name,
-                    Age = row.Cell(2).GetString().Trim(),
-                    Salary = row.Cell(3).GetString().Trim(),
-                    DurationWorked = row.Cell(4).GetString().Trim(),
-                    Grade = row.Cell(5).GetString().Trim(),
-                    Email = row.Cell(6).GetString().Trim()
-                });
+                yield return new ExcelDataRow(row, i + 1);
             }
-
-            return result;
         }
     }
 }

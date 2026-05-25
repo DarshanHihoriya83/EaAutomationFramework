@@ -5,31 +5,36 @@ using Xunit;
 
 namespace EaTestAutomation.Test
 {
-    /// <summary>
-    /// Edit Employee test using AI self-healing — runs every row from Excel <c>AddEditEmployee</c>.
-    /// </summary>
     public class AISelfhealingEditEMPTTest : BaseTest
     {
         private const string WorksheetName = "AddEditEmployee";
 
         public static IEnumerable<object[]> LoadEditEmployeeData()
         {
-            foreach (ExcelDataLoader.EmployeeExcelRow row in ExcelDataLoader.LoadEmployeeRows(WorksheetName))
+            foreach (ExcelDataLoader.ExcelDataRow row in ExcelDataLoader.ReadRows(WorksheetName))
             {
-                string testName = $"AISelfHeal_EditEmployee_{row.Name}_R{row.RowIndex}";
+                string name = row.Cell(1);
+                string age = row.Cell(2);
+                string salary = row.Cell(3);
+                string durationWorked = row.Cell(4);
+                string grade = row.Cell(5);
+                string email = row.Cell(6);
+                string reference = row.Reference;
 
-                ExcelTestTracker.TrackTestRow(testName, row.RowIndex, row.Reference);
+                string testName = $"AISelfHeal_EditEmployee_{name}_R{row.RowIndex}";
+
+                ExcelTestTracker.TrackTestRow(testName, row.RowIndex, reference);
 
                 yield return new object[]
                 {
-                    row.Name,
-                    row.Age,
-                    row.Salary,
-                    row.DurationWorked,
-                    row.Grade,
-                    row.Email,
+                    name,
+                    age,
+                    salary,
+                    durationWorked,
+                    grade,
+                    email,
                     testName,
-                    row.Reference
+                    reference
                 };
             }
         }
@@ -59,14 +64,9 @@ namespace EaTestAutomation.Test
                     $"{_testSettings.Applicationurl.TrimEnd('/')}/Employee");
 
                 await editPage.ClickEmployees();
-
-                await editPage.FillAsync(
-                    "form.search-card input[name='searchTerm']xxx",
-                    name);
-
                 await editPage.FillSearchInput(name);
                 await editPage.ClickSearchButton();
-                await editPage.FilterUserandEditUser(name);
+                await editPage.FilterUserandEditUser(name, reference);
                 await editPage.EditFullname("Raj");
                 await editPage.EditEditAge(age);
                 await editPage.EditSalaryInput(salary);
