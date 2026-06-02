@@ -28,7 +28,7 @@ namespace EAFramework.Base
 
             _rootElement = rootElement;
 
-            _healingEngine = new SelfHealingEngine(_page);
+            _healingEngine = HealingEngineCache.Get(_page);
 
             _locatorRepository = new LocatorRepository(_page);
         }

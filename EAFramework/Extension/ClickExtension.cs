@@ -11,6 +11,8 @@ namespace EAFramework.Extension
             this ILocator locator,
             int timeout = 30000)
         {
+            locator = await LocatorHealingResolver.ResolveAsync(locator);
+
             await locator.WaitForAsync(new()
             {
                 State = WaitForSelectorState.Visible,
@@ -101,23 +103,6 @@ namespace EAFramework.Extension
             throw new Exception(
                 $"Retry click failed after {retryCount} attempts.",
                 lastException);
-        }
-
-        #endregion
-
-        #region ===== AI SELF HEALING CLICK =====
-
-        public static async Task HealingClickAsync(
-            this IPage page,
-            string selector,
-            int timeout = 30000)
-        {
-            var healingEngine = new SelfHealingEngine(page);
-
-            var locator = await healingEngine
-                .FindElementAsync(selector);
-
-            await locator.ClickExAsync(timeout);
         }
 
         #endregion

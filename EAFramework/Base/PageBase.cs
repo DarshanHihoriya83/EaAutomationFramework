@@ -20,8 +20,7 @@ namespace EAFramework.Base
         {
             _page = page;
 
-            _healingEngine =
-                new SelfHealingEngine(_page);
+            _healingEngine = HealingEngineCache.Get(_page);
         }
 
         #endregion
@@ -87,6 +86,8 @@ namespace EAFramework.Base
         public async Task ClickAsync(
             ILocator locator)
         {
+            locator = await LocatorHealingResolver.ResolveAsync(locator);
+
             await HighlightElementAsync(locator);
 
             await locator.DynamicsClickAsync();
@@ -113,6 +114,8 @@ namespace EAFramework.Base
             ILocator locator,
             string value)
         {
+            locator = await LocatorHealingResolver.ResolveAsync(locator);
+
             await HighlightElementAsync(locator);
 
             await locator.DynamicsFillAsync(value);

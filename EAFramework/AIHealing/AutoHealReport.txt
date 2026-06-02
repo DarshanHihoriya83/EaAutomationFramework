@@ -1,9 +1,9 @@
 ﻿========== AI SELF-HEALING REPORT ==========
-Generated On : 2026-05-25T17:18:47.0798086+05:30
+Generated On : 2026-05-26T19:07:48.6630815+05:30
 Store File    : C:\EaAutomationFramework\EAFramework\AIHealing\FailedLocatorStore.json
 Total Mappings: 1
 
-[2026-05-25 17:18:47]
-  Original: .form-card-body .form-row-2 #Salary2
-  Healed  : .form-card-body .form-row-2 #Salary
+[2026-05-26 19:07:48]
+  Original: nav >> .container >> a:has-text('Register1')
+  Healed  : nav .container a:has-text('Register')
 

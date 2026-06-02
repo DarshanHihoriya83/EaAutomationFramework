@@ -1,3 +1,3 @@
 {
-  ".form-card-body .form-row-2 #Salary2": ".form-card-body .form-row-2 #Salary"
+  "nav \u003E\u003E .container \u003E\u003E a:has-text(\u0027Register1\u0027)": "nav .container a:has-text(\u0027Register\u0027)"
 }

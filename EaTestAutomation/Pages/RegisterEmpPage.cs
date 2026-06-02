@@ -1,4 +1,4 @@
-﻿using EAFramework.Base;
+using EAFramework.Base;
 using Microsoft.Playwright;
 using System;
 using System.Collections.Generic;
@@ -18,14 +18,14 @@ namespace EaTestAutomation.Pages
 
         private ILocator NavigationBar => Locator("nav");    
         private ILocator ContainerClass => NavigationBar.Locator(".container");   
-        private ILocator RegistrationButton => ContainerClass.Locator("//a[text()='Register1']");
+        private ILocator RegistrationButton => ContainerClass.Locator("a:has-text('Register')");
         private ILocator RegistratonFromDiv => Locator(".register-wrapper");
         private ILocator RegistratonFromContainer => RegistratonFromDiv.Locator("form");
         private ILocator InputDiv => RegistratonFromContainer.Locator(".mb-3");
-        private ILocator UsernameInput => InputDiv.Locator("//input[@name='UserName']");
-        private ILocator EmailInput => InputDiv.Locator("#Email");
-        private ILocator PasswordInput => InputDiv.GetByPlaceholder("Create a strong password");
-        private ILocator ConfirmPasswordInput => InputDiv.GetByPlaceholder("Repeat your password");
+        private ILocator UsernameInput => RegistratonFromContainer.Locator("input[name='UserName']");
+        private ILocator EmailInput => RegistratonFromContainer.Locator("input[name='Email']");
+        private ILocator PasswordInput => RegistratonFromContainer.Locator("input[name='Password']");
+        private ILocator ConfirmPasswordInput => RegistratonFromContainer.Locator("input[name='ConfirmPassword']");
         private ILocator CreateAccountButton => RegistratonFromContainer.Locator("button:has-text('Create Account')");
         private ILocator ProfileButton => NavigationBar.GetByTitle("Manage");         
         private ILocator LogoutNavBarForm => NavigationBar.Locator("form.form-inline");
@@ -35,7 +35,8 @@ namespace EaTestAutomation.Pages
 
         public async Task ClickonRegistationButton()
         {
-            await ClickExAsync(RegistrationButton);      
+            await ClickExAsync(RegistrationButton);
+            await WaitForVisibleAsync(RegistratonFromContainer, 15000);
         }
          
         public async Task EnterUsername(string username)
@@ -60,7 +61,8 @@ namespace EaTestAutomation.Pages
 
         public async Task ClickonCreateAccountButton()
         {
-            await ClickExAsync(CreateAccountButton);      
+            await ClickExAsync(CreateAccountButton);
+            await _page.WaitForLoadStateAsync(LoadState.NetworkIdle);
         }
 
         public async Task profileButton()
@@ -71,6 +73,20 @@ namespace EaTestAutomation.Pages
         public async Task ClickonLogoutButton()
         {
             await ClickExAsync(LogoutButton);      
+        }
+
+        /// <summary>Returns true when registration succeeded and the signed-in nav is visible.</summary>
+        public async Task<bool> WaitForRegisteredSessionAsync(int timeoutMs = 45000)
+        {
+            try
+            {
+                await WaitForVisibleAsync("nav a[title='Manage']", timeoutMs);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
         
     }

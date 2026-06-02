@@ -1,4 +1,5 @@
-﻿using Microsoft.Playwright;
+﻿using EAFramework.AIHealing;
+using Microsoft.Playwright;
 
 namespace EAFramework.Extension
 {
@@ -44,6 +45,8 @@ namespace EAFramework.Extension
             this ILocator locator,
             string screenshotName)
         {
+            locator = await LocatorHealingResolver.ResolveAsync(locator);
+
             string folderPath = Path.Combine(
                 Directory.GetCurrentDirectory(),
                 "Reports",
@@ -305,6 +308,8 @@ namespace EAFramework.Extension
             this ILocator locator,
             string screenshotName)
         {
+            locator = await LocatorHealingResolver.ResolveAsync(locator);
+
             if (await locator.CountAsync() > 0)
             {
                 return await locator
@@ -322,6 +327,7 @@ namespace EAFramework.Extension
             this ILocator locator,
             string screenshotName)
         {
+            locator = await LocatorHealingResolver.ResolveAsync(locator);
             var page = locator.Page;
 
             var elementHandle =

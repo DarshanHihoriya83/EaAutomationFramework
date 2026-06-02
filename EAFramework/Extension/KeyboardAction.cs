@@ -1,4 +1,5 @@
-﻿using Microsoft.Playwright;
+﻿using EAFramework.AIHealing;
+using Microsoft.Playwright;
 
 namespace EAFramework.Extension
 {
@@ -21,6 +22,7 @@ namespace EAFramework.Extension
             this ILocator locator,
             string key)
         {
+            locator = await LocatorHealingResolver.ResolveAsync(locator);
             await locator.PressAsync(key);
         }
 
@@ -48,6 +50,7 @@ namespace EAFramework.Extension
             string text,
             int delayMilliseconds = 50)
         {
+            locator = await LocatorHealingResolver.ResolveAsync(locator);
             await locator.TypeAsync(text, new()
             {
                 Delay = delayMilliseconds
@@ -83,6 +86,7 @@ namespace EAFramework.Extension
         public static async Task CopyAsync(
             this ILocator locator)
         {
+            locator = await LocatorHealingResolver.ResolveAsync(locator);
             await locator.ClickAsync();
 
             await locator.PressAsync("Control+A");
@@ -97,6 +101,7 @@ namespace EAFramework.Extension
         public static async Task PasteAsync(
             this ILocator locator)
         {
+            locator = await LocatorHealingResolver.ResolveAsync(locator);
             await locator.ClickAsync();
 
             await locator.PressAsync("Control+V");
@@ -109,6 +114,7 @@ namespace EAFramework.Extension
         public static async Task CutAsync(
             this ILocator locator)
         {
+            locator = await LocatorHealingResolver.ResolveAsync(locator);
             await locator.ClickAsync();
 
             await locator.PressAsync("Control+A");
@@ -123,6 +129,7 @@ namespace EAFramework.Extension
         public static async Task SelectAllAsync(
             this ILocator locator)
         {
+            locator = await LocatorHealingResolver.ResolveAsync(locator);
             await locator.ClickAsync();
 
             await locator.PressAsync("Control+A");
@@ -135,6 +142,7 @@ namespace EAFramework.Extension
         public static async Task ClearTextAsync(
             this ILocator locator)
         {
+            locator = await LocatorHealingResolver.ResolveAsync(locator);
             await locator.ClickAsync();
 
             await locator.PressAsync("Control+A");
@@ -149,6 +157,7 @@ namespace EAFramework.Extension
         public static async Task PressEnterAsync(
             this ILocator locator)
         {
+            locator = await LocatorHealingResolver.ResolveAsync(locator);
             await locator.PressAsync("Enter");
         }
 
@@ -159,6 +168,7 @@ namespace EAFramework.Extension
         public static async Task PressTabAsync(
             this ILocator locator)
         {
+            locator = await LocatorHealingResolver.ResolveAsync(locator);
             await locator.PressAsync("Tab");
         }
 
@@ -169,6 +179,7 @@ namespace EAFramework.Extension
         public static async Task PressEscapeAsync(
             this ILocator locator)
         {
+            locator = await LocatorHealingResolver.ResolveAsync(locator);
             await locator.PressAsync("Escape");
         }
 
@@ -179,6 +190,7 @@ namespace EAFramework.Extension
         public static async Task ArrowDownAsync(
             this ILocator locator)
         {
+            locator = await LocatorHealingResolver.ResolveAsync(locator);
             await locator.PressAsync("ArrowDown");
         }
 
@@ -189,6 +201,7 @@ namespace EAFramework.Extension
         public static async Task ArrowUpAsync(
             this ILocator locator)
         {
+            locator = await LocatorHealingResolver.ResolveAsync(locator);
             await locator.PressAsync("ArrowUp");
         }
 
@@ -199,6 +212,7 @@ namespace EAFramework.Extension
         public static async Task ArrowLeftAsync(
             this ILocator locator)
         {
+            locator = await LocatorHealingResolver.ResolveAsync(locator);
             await locator.PressAsync("ArrowLeft");
         }
 
@@ -209,6 +223,7 @@ namespace EAFramework.Extension
         public static async Task ArrowRightAsync(
             this ILocator locator)
         {
+            locator = await LocatorHealingResolver.ResolveAsync(locator);
             await locator.PressAsync("ArrowRight");
         }
 
@@ -332,6 +347,7 @@ namespace EAFramework.Extension
         public static async Task PressDeleteAsync(
             this ILocator locator)
         {
+            locator = await LocatorHealingResolver.ResolveAsync(locator);
             await locator.PressAsync("Delete");
         }
 
@@ -342,6 +358,7 @@ namespace EAFramework.Extension
         public static async Task PressBackspaceAsync(
             this ILocator locator)
         {
+            locator = await LocatorHealingResolver.ResolveAsync(locator);
             await locator.PressAsync("Backspace");
         }
 

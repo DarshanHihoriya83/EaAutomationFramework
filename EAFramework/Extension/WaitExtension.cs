@@ -1,4 +1,5 @@
-﻿    using Microsoft.Playwright;
+﻿using EAFramework.AIHealing;
+using Microsoft.Playwright;
 
 namespace EAFramework.Extension
 {
@@ -39,85 +40,72 @@ namespace EAFramework.Extension
 
         #region ===== WAIT FOR ELEMENT VISIBLE =====
 
-        public static async Task WaitForVisibleAsync(
+        public static Task WaitForVisibleAsync(
             this ILocator locator,
-            int timeout = 30000)
-        {
-            await locator.WaitForAsync(new()
-            {
-                State = WaitForSelectorState.Visible,
-                Timeout = timeout
-            });
-        }
+            int timeout = 30000) =>
+            LocatorHealingResolver.WaitFirstThenHealAsync(
+                locator,
+                WaitForSelectorState.Visible,
+                timeout);
 
         #endregion
 
         #region ===== WAIT FOR ELEMENT HIDDEN =====
 
-        public static async Task WaitForHiddenAsync(
+        public static Task WaitForHiddenAsync(
             this ILocator locator,
-            int timeout = 30000)
-        {
-            await locator.WaitForAsync(new()
-            {
-                State = WaitForSelectorState.Hidden,
-                Timeout = timeout
-            });
-        }
+            int timeout = 30000) =>
+            LocatorHealingResolver.WaitFirstThenHealAsync(
+                locator,
+                WaitForSelectorState.Hidden,
+                timeout);
 
         #endregion
 
         #region ===== WAIT FOR ELEMENT ATTACHED =====
 
-        public static async Task WaitForAttachedAsync(
+        public static Task WaitForAttachedAsync(
             this ILocator locator,
-            int timeout = 30000)
-        {
-            await locator.WaitForAsync(new()
-            {
-                State = WaitForSelectorState.Attached,
-                Timeout = timeout
-            });
-        }
+            int timeout = 30000) =>
+            LocatorHealingResolver.WaitFirstThenHealAsync(
+                locator,
+                WaitForSelectorState.Attached,
+                timeout);
 
         #endregion
 
         #region ===== WAIT FOR ELEMENT DETACHED =====
 
-        public static async Task WaitForDetachedAsync(
+        public static Task WaitForDetachedAsync(
             this ILocator locator,
-            int timeout = 30000)
-        {
-            await locator.WaitForAsync(new()
-            {
-                State = WaitForSelectorState.Detached,
-                Timeout = timeout
-            });
-        }
+            int timeout = 30000) =>
+            LocatorHealingResolver.WaitFirstThenHealAsync(
+                locator,
+                WaitForSelectorState.Detached,
+                timeout);
 
         #endregion
 
         #region ===== WAIT FOR ENABLED =====
 
-        public static async Task WaitForEnabledAsync(
+        public static Task WaitForEnabledAsync(
             this ILocator locator,
-            int timeout = 30000)
-        {
-            for (int second = 0;
-                 second < timeout / 1000;
-                 second++)
+            int timeout = 30000) =>
+            LocatorHealingResolver.RunAsync(locator, async resolved =>
             {
-                if (await locator.IsEnabledAsync())
+                for (int second = 0; second < timeout / 1000; second++)
                 {
-                    return;
+                    if (await resolved.IsEnabledAsync())
+                    {
+                        return;
+                    }
+
+                    await Task.Delay(1000);
                 }
 
-                await Task.Delay(1000);
-            }
-
-            throw new TimeoutException(
-                "Element not enabled within timeout.");
-        }
+                throw new TimeoutException(
+                    "Element not enabled within timeout.");
+            });
 
         #endregion
 

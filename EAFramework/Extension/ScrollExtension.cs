@@ -1,4 +1,5 @@
-﻿using Microsoft.Playwright;
+﻿using EAFramework.AIHealing;
+using Microsoft.Playwright;
 
 namespace EAFramework.Extension
 {
@@ -9,6 +10,8 @@ namespace EAFramework.Extension
         public static async Task ScrollIntoViewExAsync(
             this ILocator locator)
         {
+            locator = await LocatorHealingResolver.ResolveAsync(locator);
+
             await locator.WaitForAsync(new()
             {
                 State = WaitForSelectorState.Attached
@@ -72,6 +75,7 @@ namespace EAFramework.Extension
             this ILocator locator,
             int scrollAmount)
         {
+            locator = await LocatorHealingResolver.ResolveAsync(locator);
             var page = locator.Page;
 
             var elementHandle =
@@ -100,6 +104,7 @@ namespace EAFramework.Extension
             this ILocator locator,
             int scrollAmount)
         {
+            locator = await LocatorHealingResolver.ResolveAsync(locator);
             var page = locator.Page;
 
             var elementHandle =

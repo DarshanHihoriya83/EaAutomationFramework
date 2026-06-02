@@ -1,0 +1,22 @@
+import { chromium } from 'playwright';
+
+const browser = await chromium.launch({ headless: true });
+const page = await browser.newPage();
+await page.goto('http://eaapp.somee.com');
+await page.locator("nav a:has-text('Register')").click();
+await page.waitForTimeout(1000);
+const u = `user${Date.now()}`;
+await page.locator("input[name='UserName']").fill(u);
+await page.locator("#Email").fill(`${u}@test.com`);
+await page.locator("input[name='Password']").fill('Password1');
+await page.locator("input[name='ConfirmPassword']").fill('Password1');
+await page.locator("button:has-text('Create Account')").click();
+await page.waitForTimeout(4000);
+console.log('url', page.url());
+console.log('profile title Manage', await page.locator('nav [title="Manage"]').count());
+console.log('a.manage', await page.locator('nav a[title="Manage"]').count());
+console.log('logout btn', await page.locator("button:has-text('Logout')").count());
+console.log('logout link', await page.locator("a:has-text('Logout')").count());
+const nav = await page.locator('nav').innerHTML();
+console.log(nav.slice(0, 2000));
+await browser.close();

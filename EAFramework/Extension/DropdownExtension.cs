@@ -1,4 +1,5 @@
-﻿using Microsoft.Playwright;
+﻿using EAFramework.AIHealing;
+using Microsoft.Playwright;
 
 namespace EAFramework.Extension
 {
@@ -10,6 +11,8 @@ namespace EAFramework.Extension
             this ILocator locator,
             string visibleText)
         {
+            locator = await LocatorHealingResolver.ResolveAsync(locator);
+
             await locator.WaitForAsync(new()
             {
                 State = WaitForSelectorState.Visible
@@ -29,6 +32,8 @@ namespace EAFramework.Extension
             this ILocator locator,
             string value)
         {
+            locator = await LocatorHealingResolver.ResolveAsync(locator);
+
             await locator.WaitForAsync(new()
             {
                 State = WaitForSelectorState.Visible
@@ -48,6 +53,8 @@ namespace EAFramework.Extension
             this ILocator locator,
             int index)
         {
+            locator = await LocatorHealingResolver.ResolveAsync(locator);
+
             await locator.WaitForAsync(new()
             {
                 State = WaitForSelectorState.Visible
@@ -91,6 +98,8 @@ namespace EAFramework.Extension
             this ILocator locator,
             params string[] values)
         {
+            locator = await LocatorHealingResolver.ResolveAsync(locator);
+
             await locator.WaitForAsync(new()
             {
                 State = WaitForSelectorState.Visible

@@ -108,7 +108,7 @@ namespace EaTestAutomation.Base
                 {
                     ArtifactRoot = ArtifactRoot,
                     EnableTracing = true,
-                    EnableVideo = true
+                    EnableVideo = _testSettings.EnableVideo
                 };
 
                 _playwrightDriver = new PlaywrightDriver(

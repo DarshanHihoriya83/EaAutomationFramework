@@ -26,6 +26,9 @@ namespace EAFramework.Config
 
         /// <summary>Reserved cap for UI tab navigation per browser (documented for operators).</summary>
         public int MaxBrowserTabs { get; set; } = 1;
+
+        /// <summary>When true, Playwright records video under each test artifact <c>video/</c> folder.</summary>
+        public bool EnableVideo { get; set; } = true;
     }
 
     public enum DriverType

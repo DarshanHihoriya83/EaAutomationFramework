@@ -64,12 +64,36 @@ namespace EAFramework.AIHealing
 
         public async Task<ILocator> FindElementAsync(string selector)
         {
+            ILocator? locator = await TryFindElementAsync(selector);
+
+            if (locator != null)
+            {
+                return locator;
+            }
+
+            return await HealLocatorAsync(selector);
+        }
+
+        /// <summary>
+        /// Tries original selector then cached heal without throwing. Used by auto-retry flows.
+        /// </summary>
+        public async Task<ILocator?> TryFindElementAsync(string selector)
+        {
             if (await IsSelectorUsableAsync(selector))
             {
                 return _page.Locator(selector);
             }
 
-            return await HealLocatorAsync(selector);
+            Dictionary<string, string> healedLocators = LoadHealedLocators();
+
+            if (healedLocators.TryGetValue(selector, out string? cachedSelector)
+                && !IsSuspiciousHealedPair(selector, cachedSelector)
+                && await IsSelectorUsableAsync(cachedSelector))
+            {
+                return _page.Locator(cachedSelector);
+            }
+
+            return null;
         }
 
         private async Task<bool> IsSelectorUsableAsync(string selector)
@@ -124,6 +148,9 @@ namespace EAFramework.AIHealing
 
             healedSelector ??=
                 await TryHealIdTypoSuffixAsync(failedSelector);
+
+            healedSelector ??=
+                await TryHealRegisterNavAsync(failedSelector);
 
             healedSelector ??=
                 await TryBuiltInAlternativesAsync(failedSelector);
@@ -243,6 +270,50 @@ namespace EAFramework.AIHealing
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Heals registration / post-login nav links (e.g. Register1, Manage profile).
+        /// </summary>
+        private async Task<string?> TryHealRegisterNavAsync(string failedSelector)
+        {
+            if (!failedSelector.Contains("Register", StringComparison.OrdinalIgnoreCase)
+                && !failedSelector.Contains("Manage", StringComparison.OrdinalIgnoreCase))
+            {
+                return null;
+            }
+
+            List<string> candidates = new();
+
+            if (failedSelector.Contains("Register", StringComparison.OrdinalIgnoreCase))
+            {
+                candidates.AddRange(new[]
+                {
+                    "nav .container a:has-text('Register')",
+                    "nav a:has-text('Register')",
+                    "a:has-text('Register')",
+                });
+            }
+
+            if (failedSelector.Contains("Manage", StringComparison.OrdinalIgnoreCase))
+            {
+                candidates.AddRange(new[]
+                {
+                    "nav a[title='Manage']",
+                    "nav .navbar-nav a[title='Manage']",
+                    "a[title='Manage']",
+                });
+            }
+
+            foreach (string candidate in candidates.Distinct())
+            {
+                if (await IsSelectorUsableAsync(candidate))
+                {
+                    return candidate;
+                }
+            }
+
+            return null;
         }
 
         /// <summary>

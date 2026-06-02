@@ -55,7 +55,7 @@ namespace EaTestAutomation.Parallel
             {
                 ArtifactRoot = artifactRoot,
                 EnableTracing = true,
-                EnableVideo = true
+                EnableVideo = settings.EnableVideo
             };
 
             var driver = new PlaywrightDriver(

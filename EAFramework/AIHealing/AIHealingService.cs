@@ -11,7 +11,7 @@ namespace EAFramework.AIHealing
 
         public AIHealingService(IPage page)
         {
-            _engine = new SelfHealingEngine(page);
+            _engine = HealingEngineCache.Get(page);
         }
 
         public Task<ILocator> FindElementAsync(string locator) =>
